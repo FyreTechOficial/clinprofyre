@@ -116,9 +116,12 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     if (existingLeads && existingLeads.length > 0) {
-      // Update last_interaction and name if we have pushName and name is just the phone
+      // Update last_interaction and name
       const update: any = { last_interaction: new Date().toISOString() };
-      if (pushName && (!existingLeads[0].name || existingLeads[0].name === phone)) {
+      // Always update name with pushName if current name is phone number or empty
+      const currentName = existingLeads[0].name || "";
+      const isNameJustNumber = /^\d+$/.test(currentName);
+      if (pushName && (isNameJustNumber || !currentName || currentName === phone)) {
         update.name = pushName;
       }
       await supabase.from("leads").update(update).eq("id", existingLeads[0].id);
