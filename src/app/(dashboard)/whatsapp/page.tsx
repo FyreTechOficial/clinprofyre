@@ -262,11 +262,28 @@ export default function WhatsAppPage() {
   const [search, setSearch] = useState("");
   const [sending, setSending] = useState(false);
   const [loadingMsgs, setLoadingMsgs] = useState(false);
+  const [profilePhotos, setProfilePhotos] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { tenantId } = useAuth();
   const selectedConv = conversations.find((c) => c.phone === selectedPhone);
+
+  // Fetch profile photos for conversations
+  useEffect(() => {
+    if (conversations.length === 0) return;
+    conversations.forEach((conv) => {
+      if (profilePhotos[conv.phone]) return;
+      fetch(`/api/whatsapp/profile-photo?phone=${conv.phone}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.photoUrl) {
+            setProfilePhotos((prev) => ({ ...prev, [conv.phone]: data.photoUrl }));
+          }
+        })
+        .catch(() => {});
+    });
+  }, [conversations]);
 
   /* ---------- Check connection on mount ---------- */
   const checkConnection = async () => {
@@ -529,9 +546,13 @@ export default function WhatsAppPage() {
               )}
             >
               <div className="relative shrink-0">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-sm font-bold text-gray-600">
-                  {getInitials(conv.name)}
-                </div>
+                {profilePhotos[conv.phone] ? (
+                  <img src={profilePhotos[conv.phone]} alt={conv.name} className="h-11 w-11 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-sm font-bold text-gray-600">
+                    {getInitials(conv.name)}
+                  </div>
+                )}
                 <span className={cn("absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white", getScoreColor(conv.score))} />
               </div>
               <div className="flex-1 min-w-0">
@@ -564,9 +585,13 @@ export default function WhatsAppPage() {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="relative">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-sm font-bold text-gray-600">
-                {getInitials(selectedConv.name)}
-              </div>
+              {profilePhotos[selectedConv.phone] ? (
+                <img src={profilePhotos[selectedConv.phone]} alt={selectedConv.name} className="h-10 w-10 rounded-full object-cover" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-sm font-bold text-gray-600">
+                  {getInitials(selectedConv.name)}
+                </div>
+              )}
               <span className={cn("absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white", getScoreColor(selectedConv.score))} />
             </div>
             <div className="flex-1 min-w-0">
