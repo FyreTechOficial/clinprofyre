@@ -7,19 +7,28 @@ import {
   Users,
   CalendarCheck,
   TrendingUp,
-  ArrowUpRight,
   Clock,
   MessageSquare,
   UserPlus,
-  CheckCircle2,
   Zap,
   Activity,
-  Phone,
   Bot,
   UserCheck,
   Loader2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 interface DashboardData {
   leadsToday: number;
@@ -47,23 +56,41 @@ const AGENT_LABELS: Record<string, string> = {
   pos_atendimento: "Pós-venda",
 };
 
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border border-gray-100 bg-white/95 backdrop-blur-sm px-4 py-3 shadow-xl">
+      <p className="text-sm font-semibold text-gray-900">{label}</p>
+      {payload.map((entry: any) => (
+        <p key={entry.name} className="text-sm mt-0.5" style={{ color: entry.color }}>
+          {entry.name}: {entry.value}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { tenantId, user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [leads, setLeads] = useState<any[]>([]);
 
   useEffect(() => {
     if (!tenantId) return;
     async function load() {
       try {
-        const [dashRes, notifRes] = await Promise.all([
+        const [dashRes, notifRes, contactsRes] = await Promise.all([
           fetch(`/api/dashboard?tenant_id=${tenantId}`),
           fetch(`/api/notifications?tenant_id=${tenantId}`),
+          fetch(`/api/contacts?tenant_id=${tenantId}`),
         ]);
         const d = await dashRes.json();
         const n = await notifRes.json();
+        const c = await contactsRes.json();
         d.recentActivity = n.activities ?? [];
         setData(d);
+        setLeads(c.contacts ?? []);
       } catch {} finally {
         setLoading(false);
       }
@@ -80,8 +107,26 @@ export default function DashboardPage() {
   const d = data ?? { leadsToday: 0, leadsTotal: 0, appointmentsToday: 0, messagesToday: 0, hotLeads: 0, agents: [], recentActivity: [] };
   const activeAgents = d.agents.filter((a) => a.enabled).length;
 
+  // Score distribution for pie chart
+  const hotCount = leads.filter((l) => l.lead_score === "quente").length;
+  const warmCount = leads.filter((l) => l.lead_score === "morno").length;
+  const coldCount = leads.filter((l) => l.lead_score === "frio").length;
+  const scoreData = [
+    { name: "Quente", value: hotCount, color: "#22c55e" },
+    { name: "Morno", value: warmCount, color: "#f59e0b" },
+    { name: "Frio", value: coldCount, color: "#ef4444" },
+  ].filter((s) => s.value > 0);
+
+  // Agent performance for chart
+  const agentChartData = d.agents.map((a) => ({
+    name: AGENT_LABELS[a.agent_type] ?? a.agent_type,
+    mensagens: a.messages_today,
+    total: a.executions_total,
+  }));
+
   return (
     <div className="animate-fade-in space-y-6">
+      {/* Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 to-brand-800 px-6 py-6 sm:px-8 sm:py-8">
         <div className="relative z-10 flex items-center justify-between">
           <div>
@@ -109,11 +154,7 @@ export default function DashboardPage() {
         ].map((metric, i) => {
           const Icon = metric.icon;
           return (
-            <div
-              key={metric.title}
-              className="animate-slide-up group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-              style={{ animationDelay: `${i * 80}ms`, animationFillMode: "both" }}
-            >
+            <div key={metric.title} className="animate-slide-up group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5" style={{ animationDelay: `${i * 80}ms`, animationFillMode: "both" }}>
               <div className={cn("absolute inset-0 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity", metric.gradient)} />
               <div className="relative flex items-start justify-between">
                 <div>
@@ -129,9 +170,89 @@ export default function DashboardPage() {
         })}
       </div>
 
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Agent Performance Chart */}
+        <Card className="lg:col-span-2 animate-slide-up !shadow-sm" style={{ animationDelay: "320ms", animationFillMode: "both" }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Performance dos Agentes</CardTitle>
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />
+                  <span className="text-gray-500">Hoje</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-gray-500">Total</span>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              {agentChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={agentChartData}>
+                    <defs>
+                      <linearGradient id="gradMsgs" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#9333ea" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#9333ea" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area type="monotone" dataKey="mensagens" name="Hoje" stroke="#9333ea" strokeWidth={2.5} fill="url(#gradMsgs)" dot={{ r: 4, fill: "#9333ea", strokeWidth: 2, stroke: "#fff" }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400 text-sm">Sem dados de agentes</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Score Pie Chart */}
+        <Card className="animate-slide-up !shadow-sm" style={{ animationDelay: "400ms", animationFillMode: "both" }}>
+          <CardHeader>
+            <CardTitle>Score dos Leads</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-48">
+              {scoreData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={scoreData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={4} dataKey="value" stroke="none">
+                      {scoreData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: unknown, name: unknown) => [`${value}`, String(name)] as [string, string]} contentStyle={{ borderRadius: "12px", border: "1px solid #f1f5f9" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400 text-sm">Sem leads</div>
+              )}
+            </div>
+            <div className="flex justify-center gap-4 mt-2">
+              {scoreData.map((entry) => (
+                <div key={entry.name} className="flex items-center gap-1.5">
+                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                  <span className="text-xs font-medium text-gray-600">{entry.name}</span>
+                  <span className="text-xs font-bold text-gray-900">{entry.value}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Agents + Activity */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Agents */}
-        <Card className="animate-slide-up !shadow-sm" style={{ animationDelay: "320ms", animationFillMode: "both" }}>
+        <Card className="animate-slide-up !shadow-sm" style={{ animationDelay: "480ms", animationFillMode: "both" }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bot className="h-5 w-5 text-brand-600" />
@@ -166,40 +287,44 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Recent activity */}
-        <Card className="lg:col-span-2 animate-slide-up !shadow-sm" style={{ animationDelay: "400ms", animationFillMode: "both" }}>
+        {/* Activity Timeline */}
+        <Card className="lg:col-span-2 animate-slide-up !shadow-sm" style={{ animationDelay: "560ms", animationFillMode: "both" }}>
           <CardHeader>
             <CardTitle>Atividade Recente</CardTitle>
           </CardHeader>
           <CardContent>
             {d.recentActivity.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Nenhuma atividade ainda. Quando pacientes enviarem mensagens, aparecerá aqui.</p>
+              <p className="text-sm text-gray-400 text-center py-8">Nenhuma atividade ainda</p>
             ) : (
-              <div className="space-y-3">
-                {d.recentActivity.map((item, i) => {
-                  const iconConfig: Record<string, { icon: any; color: string }> = {
-                    new_lead: { icon: UserPlus, color: "text-blue-600 bg-blue-50" },
-                    appointment: { icon: CalendarCheck, color: "text-emerald-600 bg-emerald-50" },
-                    pipeline: { icon: TrendingUp, color: "text-brand-600 bg-brand-50" },
-                    hot_lead: { icon: TrendingUp, color: "text-red-600 bg-red-50" },
-                  };
-                  const cfg = iconConfig[item.type] ?? { icon: Bot, color: "text-gray-600 bg-gray-50" };
-                  const Icon = cfg.icon;
-                  return (
-                    <div key={i} className="flex items-start gap-3 rounded-xl p-3 hover:bg-gray-50/80 border border-transparent hover:border-gray-100 transition-all">
-                      <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", cfg.color)}>
-                        <Icon className="h-4 w-4" />
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-[18px] top-0 bottom-0 w-0.5 bg-gray-100" />
+
+                <div className="space-y-4">
+                  {d.recentActivity.slice(0, 10).map((item, i) => {
+                    const iconConfig: Record<string, { icon: any; color: string }> = {
+                      new_lead: { icon: UserPlus, color: "text-blue-600 bg-blue-50 ring-blue-200" },
+                      appointment: { icon: CalendarCheck, color: "text-emerald-600 bg-emerald-50 ring-emerald-200" },
+                      pipeline: { icon: TrendingUp, color: "text-brand-600 bg-brand-50 ring-brand-200" },
+                      hot_lead: { icon: TrendingUp, color: "text-red-600 bg-red-50 ring-red-200" },
+                    };
+                    const cfg = iconConfig[item.type] ?? { icon: Bot, color: "text-gray-600 bg-gray-50 ring-gray-200" };
+                    const Icon = cfg.icon;
+                    return (
+                      <div key={i} className="flex items-start gap-3 relative">
+                        <div className={cn("relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-4 ring-white", cfg.color)}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0 pt-1">
+                          <p className="text-sm text-gray-700 leading-snug">{item.text}</p>
+                          <p className="mt-0.5 text-xs text-gray-400">
+                            {new Date(item.time).toLocaleString("pt-BR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm text-gray-700 leading-snug">{item.text}</p>
-                        <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
-                          <Clock className="h-3 w-3" />
-                          {new Date(item.time).toLocaleString("pt-BR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </CardContent>

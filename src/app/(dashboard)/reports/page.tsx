@@ -13,6 +13,18 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 interface ReportData {
   leadsToday: number;
@@ -171,30 +183,74 @@ export default function ReportsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Score distribution */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Score Pie Chart */}
         <Card className="!shadow-sm">
           <CardHeader><CardTitle>Score dos Leads</CardTitle></CardHeader>
           <CardContent>
             {totalLeads === 0 ? (
               <p className="text-sm text-gray-400 text-center py-8">Sem leads ainda</p>
             ) : (
-              <div className="space-y-4">
-                {[
-                  { label: "Quente", count: hotCount, color: "bg-emerald-500", pct: Math.round((hotCount / totalLeads) * 100) },
-                  { label: "Morno", count: warmCount, color: "bg-amber-500", pct: Math.round((warmCount / totalLeads) * 100) },
-                  { label: "Frio", count: coldCount, color: "bg-red-500", pct: Math.round((coldCount / totalLeads) * 100) },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">{item.label}</span>
-                      <span className="text-sm font-bold text-gray-900">{item.count} ({item.pct}%)</span>
+              <>
+                <div className="h-52">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={[
+                        { name: "Quente", value: hotCount, color: "#22c55e" },
+                        { name: "Morno", value: warmCount, color: "#f59e0b" },
+                        { name: "Frio", value: coldCount, color: "#ef4444" },
+                      ].filter((s) => s.value > 0)} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={4} dataKey="value" stroke="none">
+                        {[
+                          { color: "#22c55e" }, { color: "#f59e0b" }, { color: "#ef4444" },
+                        ].filter((_, i) => [hotCount, warmCount, coldCount][i] > 0).map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(v: unknown, n: unknown) => [`${v}`, String(n)] as [string, string]} contentStyle={{ borderRadius: "12px", border: "1px solid #f1f5f9" }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex justify-center gap-4 mt-2">
+                  {[
+                    { label: "Quente", value: hotCount, color: "#22c55e" },
+                    { label: "Morno", value: warmCount, color: "#f59e0b" },
+                    { label: "Frio", value: coldCount, color: "#ef4444" },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center gap-1.5">
+                      <span className="h-3 w-3 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span className="text-xs font-medium text-gray-600">{s.label}</span>
+                      <span className="text-xs font-bold text-gray-900">{s.value}</span>
                     </div>
-                    <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
-                      <div className={cn("h-full rounded-full transition-all", item.color)} style={{ width: `${item.pct}%` }} />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Sources Bar Chart */}
+        <Card className="lg:col-span-2 !shadow-sm">
+          <CardHeader><CardTitle>Leads por Origem</CardTitle></CardHeader>
+          <CardContent>
+            {sources.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-8">Sem dados</p>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sources.map(([source, count]) => ({ source: source.charAt(0).toUpperCase() + source.slice(1), leads: count }))} barSize={40}>
+                    <defs>
+                      <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#9333ea" />
+                        <stop offset="100%" stopColor="#7c3aed" />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="source" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #f1f5f9" }} />
+                    <Bar dataKey="leads" fill="url(#barGrad)" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             )}
           </CardContent>
