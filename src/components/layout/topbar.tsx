@@ -55,7 +55,10 @@ export default function Topbar({ user }: TopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [hotLeads, setHotLeads] = useState<HotLead[]>([]);
-  const [dismissedAt, setDismissedAt] = useState<string | null>(null);
+  const [dismissedAt, setDismissedAt] = useState<string | null>(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("clinpro_notif_dismissed");
+    return null;
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -131,7 +134,7 @@ export default function Topbar({ user }: TopbarProps) {
                     </span>
                   )}
                   {visibleLeads.length > 0 && (
-                    <button onClick={() => { setDismissedAt(new Date().toISOString()); setNotifOpen(false); }} className="text-xs text-gray-400 hover:text-gray-600">
+                    <button onClick={() => { const now = new Date().toISOString(); setDismissedAt(now); localStorage.setItem("clinpro_notif_dismissed", now); setNotifOpen(false); }} className="text-xs text-gray-400 hover:text-gray-600">
                       Limpar
                     </button>
                   )}
