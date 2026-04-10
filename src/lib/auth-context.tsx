@@ -16,6 +16,11 @@ interface Tenant {
   slug: string;
   evolution_instance: string;
   owner_phone: string;
+  phone?: string;
+  address?: string;
+  working_hours?: string;
+  alert_group_id?: string;
+  alert_group_name?: string;
 }
 
 interface AuthContextType {

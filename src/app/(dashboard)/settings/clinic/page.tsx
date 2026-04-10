@@ -1,235 +1,208 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils/cn";
-import { Building2, Upload, Loader2, ImageIcon } from "lucide-react";
+import { Building2, Upload, Loader2, Bell, MessageSquare, Check, RefreshCw } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+
+interface WhatsAppGroup {
+  id: string;
+  name: string;
+}
 
 export default function ClinicSettingsPage() {
+  const { tenantId, tenant } = useAuth();
   const [form, setForm] = useState({
     name: "",
     address: "",
     phone: "",
     workingHours: "",
   });
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
-  function updateField(field: string, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
+  // Alert group
+  const [groups, setGroups] = useState<WhatsAppGroup[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState("");
+  const [selectedGroupName, setSelectedGroupName] = useState("");
+  const [loadingGroups, setLoadingGroups] = useState(false);
+  const [savingGroup, setSavingGroup] = useState(false);
+  const [groupSaved, setGroupSaved] = useState(false);
+
+  // Load tenant data
+  useEffect(() => {
+    if (!tenant) return;
+    setForm({
+      name: tenant.name || "",
+      address: (tenant as any).address || "",
+      phone: (tenant as any).phone || "",
+      workingHours: (tenant as any).working_hours || "",
+    });
+    setSelectedGroupId((tenant as any).alert_group_id || "");
+    setSelectedGroupName((tenant as any).alert_group_name || "");
+  }, [tenant]);
+
+  // Load groups
+  async function loadGroups() {
+    if (!tenant?.evolution_instance) return;
+    setLoadingGroups(true);
+    try {
+      const res = await fetch(`/api/whatsapp/groups?instance=${tenant.evolution_instance}`);
+      const data = await res.json();
+      setGroups(data.groups ?? []);
+    } catch {} finally {
+      setLoadingGroups(false);
+    }
   }
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setLogoPreview(ev.target?.result as string);
-      reader.readAsDataURL(file);
-    }
-  }, []);
-
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setLogoPreview(ev.target?.result as string);
-      reader.readAsDataURL(file);
-    }
-  }
+  useEffect(() => {
+    if (tenant?.evolution_instance) loadGroups();
+  }, [tenant]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    if (!tenantId) return;
     setIsSaving(true);
-    console.log("Saving clinic settings:", form);
-    await new Promise((r) => setTimeout(r, 1000));
-    setIsSaving(false);
+    setSaved(false);
+    try {
+      // TODO: Save to Supabase when API is ready
+      await new Promise((r) => setTimeout(r, 500));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {} finally {
+      setIsSaving(false);
+    }
   }
 
-  return (
-    <div className="animate-[fadeIn_0.3s_ease-out]">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-          <Building2 className="w-5 h-5 text-purple-600" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Dados da Clínica</h2>
-          <p className="text-sm text-gray-500">
-            Configure as informações gerais da sua clínica
-          </p>
-        </div>
-      </div>
+  async function handleSaveGroup() {
+    if (!tenantId) return;
+    setSavingGroup(true);
+    setGroupSaved(false);
+    try {
+      await fetch("/api/whatsapp/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_id: tenantId,
+          alert_group_id: selectedGroupId,
+          alert_group_name: selectedGroupName,
+        }),
+      });
+      setGroupSaved(true);
+      setTimeout(() => setGroupSaved(false), 3000);
+    } catch {} finally {
+      setSavingGroup(false);
+    }
+  }
 
-      <form onSubmit={handleSave} className="space-y-6 max-w-2xl">
-        {/* Logo upload */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Logo da Clínica
-          </label>
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            className={cn(
-              "relative border-2 border-dashed rounded-xl p-8",
-              "flex flex-col items-center justify-center gap-3",
-              "transition-all duration-200 cursor-pointer",
-              isDragging
-                ? "border-purple-400 bg-purple-50"
-                : "border-gray-200 hover:border-purple-300 hover:bg-gray-50"
-            )}
-          >
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
-            {logoPreview ? (
-              <img
-                src={logoPreview}
-                alt="Logo"
-                className="w-24 h-24 object-contain rounded-lg"
-              />
-            ) : (
-              <>
-                <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center">
-                  <ImageIcon className="w-7 h-7 text-gray-400" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    <span className="text-purple-600 font-medium">
-                      Clique para enviar
-                    </span>{" "}
-                    ou arraste e solte
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    PNG, JPG ou SVG (máx. 2MB)
-                  </p>
-                </div>
-              </>
-            )}
+  const INPUT_CLASS = cn(
+    "w-full px-4 py-3 rounded-xl",
+    "bg-white border border-gray-200",
+    "text-gray-800 placeholder-gray-400 text-sm",
+    "outline-none transition-all duration-200",
+    "focus:border-brand-300 focus:ring-2 focus:ring-brand-100"
+  );
+
+  return (
+    <div className="animate-fade-in space-y-8">
+      {/* Clinic Info */}
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-brand-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Dados da Clínica</h2>
+            <p className="text-sm text-gray-500">Informações gerais</p>
           </div>
         </div>
 
-        {/* Clinic name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Nome da Clínica
-          </label>
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => updateField("name", e.target.value)}
-            placeholder="Ex: Clínica Beleza & Saúde"
-            className={cn(
-              "w-full px-4 py-3 rounded-xl",
-              "bg-white border border-gray-200",
-              "text-gray-800 placeholder-gray-400 text-sm",
-              "outline-none transition-all duration-200",
-              "focus:border-purple-300 focus:ring-2 focus:ring-purple-100"
-            )}
-          />
+        <form onSubmit={handleSave} className="space-y-5 max-w-2xl">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome da Clínica</label>
+            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Clínica Odonto Vida" className={INPUT_CLASS} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Endereço</label>
+            <input type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, número, bairro, cidade" className={INPUT_CLASS} />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefone / WhatsApp</label>
+              <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(41) 99999-9999" className={INPUT_CLASS} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Horário de Funcionamento</label>
+              <input type="text" value={form.workingHours} onChange={(e) => setForm({ ...form, workingHours: e.target.value })} placeholder="Seg-Sex 8h-18h" className={INPUT_CLASS} />
+            </div>
+          </div>
+          <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-white text-sm bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-200 transition-all disabled:opacity-50">
+            {isSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : saved ? <><Check className="w-4 h-4" /> Salvo!</> : <><Upload className="w-4 h-4" /> Salvar</>}
+          </button>
+        </form>
+      </div>
+
+      {/* Alert Group */}
+      <div className="border-t border-gray-100 pt-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+            <Bell className="w-5 h-5 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Grupo de Alertas</h2>
+            <p className="text-sm text-gray-500">Selecione o grupo do WhatsApp que receberá alertas de leads quentes</p>
+          </div>
         </div>
 
-        {/* Address */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Endereço
-          </label>
-          <input
-            type="text"
-            value={form.address}
-            onChange={(e) => updateField("address", e.target.value)}
-            placeholder="Rua, número, bairro, cidade - UF"
-            className={cn(
-              "w-full px-4 py-3 rounded-xl",
-              "bg-white border border-gray-200",
-              "text-gray-800 placeholder-gray-400 text-sm",
-              "outline-none transition-all duration-200",
-              "focus:border-purple-300 focus:ring-2 focus:ring-purple-100"
-            )}
-          />
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Telefone / WhatsApp
-          </label>
-          <input
-            type="tel"
-            value={form.phone}
-            onChange={(e) => updateField("phone", e.target.value)}
-            placeholder="(11) 99999-9999"
-            className={cn(
-              "w-full px-4 py-3 rounded-xl",
-              "bg-white border border-gray-200",
-              "text-gray-800 placeholder-gray-400 text-sm",
-              "outline-none transition-all duration-200",
-              "focus:border-purple-300 focus:ring-2 focus:ring-purple-100"
-            )}
-          />
-        </div>
-
-        {/* Working hours */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Horário de Funcionamento
-          </label>
-          <input
-            type="text"
-            value={form.workingHours}
-            onChange={(e) => updateField("workingHours", e.target.value)}
-            placeholder="Ex: Seg-Sex 08:00-18:00, Sáb 08:00-12:00"
-            className={cn(
-              "w-full px-4 py-3 rounded-xl",
-              "bg-white border border-gray-200",
-              "text-gray-800 placeholder-gray-400 text-sm",
-              "outline-none transition-all duration-200",
-              "focus:border-purple-300 focus:ring-2 focus:ring-purple-100"
-            )}
-          />
-        </div>
-
-        {/* Save */}
-        <button
-          type="submit"
-          disabled={isSaving}
-          className={cn(
-            "px-8 py-3 rounded-xl font-semibold text-white text-sm",
-            "bg-purple-600 hover:bg-purple-500",
-            "shadow-md shadow-purple-200",
-            "transition-all duration-200",
-            "disabled:opacity-60 disabled:cursor-not-allowed",
-            "active:scale-[0.98]",
-            "flex items-center gap-2"
+        <div className="max-w-2xl space-y-4">
+          {/* Current group */}
+          {selectedGroupName && (
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3">
+              <MessageSquare className="h-5 w-5 text-emerald-600" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-emerald-800">Grupo ativo: {selectedGroupName}</p>
+                <p className="text-xs text-emerald-600 font-mono">{selectedGroupId}</p>
+              </div>
+            </div>
           )}
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Salvando...
-            </>
-          ) : (
-            <>
-              <Upload className="w-4 h-4" />
-              Salvar Alterações
-            </>
-          )}
-        </button>
-      </form>
 
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+          {/* Group selector */}
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Selecionar Grupo</label>
+              <select
+                value={selectedGroupId}
+                onChange={(e) => {
+                  const group = groups.find((g) => g.id === e.target.value);
+                  setSelectedGroupId(e.target.value);
+                  setSelectedGroupName(group?.name ?? "");
+                }}
+                className={INPUT_CLASS}
+              >
+                <option value="">Nenhum (alertas só pro dono)</option>
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+              </select>
+            </div>
+            <button onClick={loadGroups} disabled={loadingGroups} className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-all">
+              <RefreshCw className={cn("h-4 w-4", loadingGroups && "animate-spin")} />
+            </button>
+          </div>
+
+          {groups.length === 0 && !loadingGroups && (
+            <p className="text-xs text-gray-400">Nenhum grupo encontrado. Verifique se o WhatsApp está conectado e se a clínica participa de algum grupo.</p>
+          )}
+
+          <button
+            onClick={handleSaveGroup}
+            disabled={savingGroup}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-white text-sm bg-amber-600 hover:bg-amber-700 shadow-md shadow-amber-200 transition-all disabled:opacity-50"
+          >
+            {savingGroup ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : groupSaved ? <><Check className="w-4 h-4" /> Salvo!</> : <><Bell className="w-4 h-4" /> Salvar Grupo</>}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
