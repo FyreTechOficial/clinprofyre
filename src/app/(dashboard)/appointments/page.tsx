@@ -161,7 +161,7 @@ export default function AppointmentsPage() {
           phone: newAppt.phone,
           procedure: newAppt.procedure,
           professional: newAppt.professional,
-          datetime: `${newAppt.date}T${newAppt.time}:00`,
+          datetime: `${newAppt.date}T${newAppt.time}:00-03:00`,
         }),
       });
       // Refresh
