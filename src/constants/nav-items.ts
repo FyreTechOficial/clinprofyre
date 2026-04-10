@@ -1,4 +1,4 @@
-import { LayoutDashboard, KanbanSquare, Users, Calendar, BarChart3, Sparkles, Settings, MessageCircle, Bot, Shield } from "lucide-react";
+import { LayoutDashboard, KanbanSquare, Users, Calendar, BarChart3, Sparkles, Settings, MessageCircle, Bot, Shield, HelpCircle } from "lucide-react";
 
 // Items visible to clinic users (tenants)
 export const navItems = [
@@ -10,6 +10,7 @@ export const navItems = [
   { label: "Agentes", href: "/agents", icon: Bot },
   { label: "Relatórios", href: "/reports", icon: BarChart3 },
   { label: "Clin.IA", href: "/clin-ia", icon: Sparkles },
+  { label: "Suporte", href: "/suporte", icon: HelpCircle },
   { label: "Configurações", href: "/settings/clinic", icon: Settings },
 ];
 

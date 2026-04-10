@@ -6,7 +6,6 @@ import {
   MessageCircle,
   Send,
   Search,
-  Phone,
   Sparkles,
   Clock,
   Bot,
@@ -110,10 +109,10 @@ function getInitials(name: string) {
   return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 }
 
-function getScoreColor(score: string) {
-  if (score === "quente") return "bg-emerald-500";
-  if (score === "morno") return "bg-amber-500";
-  return "bg-red-500";
+function getScoreEmoji(score: string) {
+  if (score === "quente") return "\u{1F525}";
+  if (score === "morno") return "\u{1F7E1}";
+  return "\u{2744}\uFE0F";
 }
 
 /* ------------------------------------------------------------------ */
@@ -555,12 +554,17 @@ export default function WhatsAppPage() {
                     {getInitials(conv.name)}
                   </div>
                 )}
-                <span className={cn("absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white", getScoreColor(conv.score))} />
+                <span className="absolute -bottom-0.5 -right-0.5 text-xs leading-none">{getScoreEmoji(conv.score)}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-gray-900 truncate">{conv.name}</p>
-                  <span className="text-[10px] text-gray-400 shrink-0">{formatTime(conv.lastAt)}</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[10px] text-gray-400">{formatTime(conv.lastAt)}</span>
+                    {conv.lastRole === "user" && (
+                      <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
                   {conv.lastRole === "assistant" && <CheckCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
@@ -594,15 +598,15 @@ export default function WhatsAppPage() {
                   {getInitials(selectedConv.name)}
                 </div>
               )}
-              <span className={cn("absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white", getScoreColor(selectedConv.score))} />
+              <span className="absolute -bottom-0.5 -right-0.5 text-xs leading-none">{getScoreEmoji(selectedConv.score)}</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-gray-900">{selectedConv.name}</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span>{selectedConv.phone.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, "+$1 ($2) $3-$4")}</span>
                 <span className="text-gray-300">&middot;</span>
-                <span className={cn("font-medium", selectedConv.score === "quente" ? "text-emerald-600" : selectedConv.score === "morno" ? "text-amber-600" : "text-red-600")}>
-                  {selectedConv.score === "quente" ? "Quente" : selectedConv.score === "morno" ? "Morno" : "Frio"}
+                <span className="font-medium">
+                  {selectedConv.score === "quente" ? "\u{1F525} Quente" : selectedConv.score === "morno" ? "\u{1F7E1} Morno" : "\u{2744}\uFE0F Frio"}
                 </span>
               </div>
             </div>
@@ -631,9 +635,6 @@ export default function WhatsAppPage() {
                 ) : (
                   <><Bot className="h-3.5 w-3.5" /> Reativar IA</>
                 )}
-              </button>
-              <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 transition-colors">
-                <Phone className="h-4 w-4" />
               </button>
             </div>
           </div>

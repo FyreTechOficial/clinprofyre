@@ -97,6 +97,7 @@ export default function AgentsPage() {
   const [qrBase64, setQrBase64] = useState<string | null>(null);
   const [editingAgent, setEditingAgent] = useState<AgentFlow | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [resetting, setResetting] = useState<string | null>(null);
 
   const { tenantId } = useAuth();
 
@@ -151,6 +152,24 @@ export default function AgentsPage() {
       setEditingAgent(null);
     } catch {} finally {
       setSavingEdit(false);
+    }
+  }
+
+  // Reset agent counters
+  async function resetAgent(agentType: string) {
+    if (!confirm("Tem certeza que deseja zerar os contadores deste agente?")) return;
+    setResetting(agentType);
+    try {
+      await fetch("/api/agents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant_id: tenantId, agent_type: agentType, messages_today: 0, executions_total: 0 }),
+      });
+      setAgents((prev) =>
+        prev.map((a) => a.agent_type === agentType ? { ...a, messages_today: 0, executions_total: 0 } : a)
+      );
+    } catch {} finally {
+      setResetting(null);
     }
   }
 
@@ -348,6 +367,14 @@ export default function AgentsPage() {
                       >
                         <Settings className="h-3 w-3" />
                         Editar
+                      </button>
+                      <button
+                        onClick={() => resetAgent(agent.agent_type)}
+                        disabled={resetting === agent.agent_type}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+                      >
+                        <RefreshCw className={cn("h-3 w-3", resetting === agent.agent_type && "animate-spin")} />
+                        Zerar
                       </button>
                       <span className="text-[10px] text-gray-300">{config.trigger}</span>
                     </div>

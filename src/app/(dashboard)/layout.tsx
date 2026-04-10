@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils/cn";
 import Sidebar from "@/components/layout/sidebar";
 import Topbar from "@/components/layout/topbar";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -37,6 +38,15 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+
+      {/* Clin.IA FAB */}
+      <Link
+        href="/clin-ia"
+        title="Clin.IA"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-300/40 transition-transform duration-200 hover:scale-110"
+      >
+        <Sparkles className="h-6 w-6" />
+      </Link>
     </div>
   );
 }

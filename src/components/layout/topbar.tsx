@@ -18,6 +18,7 @@ const pageTitles: Record<string, string> = {
   "/agents": "Agentes IA",
   "/reports": "Relatórios",
   "/clin-ia": "Clin.IA",
+  "/suporte": "Suporte",
   "/settings": "Configurações",
   "/admin": "Admin",
   "/teste-agentes": "Teste de Agentes",
@@ -54,6 +55,7 @@ export default function Topbar({ user }: TopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [hotLeads, setHotLeads] = useState<HotLead[]>([]);
+  const [dismissedAt, setDismissedAt] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -89,6 +91,10 @@ export default function Topbar({ user }: TopbarProps) {
     router.refresh();
   }
 
+  const visibleLeads = dismissedAt
+    ? hotLeads.filter((lead) => new Date(lead.last_interaction) > new Date(dismissedAt))
+    : hotLeads;
+
   return (
     <header className={cn("sticky top-0 z-20 flex h-16 items-center justify-between gap-4 px-6", "bg-white/80 backdrop-blur-md border-b border-gray-100/80")}>
       <h1 className="text-xl font-bold text-gray-900 truncate">{title}</h1>
@@ -107,9 +113,9 @@ export default function Topbar({ user }: TopbarProps) {
             aria-label="Notificações"
           >
             <Bell className="h-5 w-5" />
-            {hotLeads.length > 0 && (
+            {visibleLeads.length > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-white">
-                {hotLeads.length}
+                {visibleLeads.length}
               </span>
             )}
           </button>
@@ -119,23 +125,23 @@ export default function Topbar({ user }: TopbarProps) {
               <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
                 <p className="text-sm font-bold text-gray-900">Notificações</p>
                 <div className="flex items-center gap-2">
-                  {hotLeads.length > 0 && (
+                  {visibleLeads.length > 0 && (
                     <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
-                      {hotLeads.length}
+                      {visibleLeads.length}
                     </span>
                   )}
-                  {hotLeads.length > 0 && (
-                    <button onClick={() => { setHotLeads([]); setNotifOpen(false); }} className="text-xs text-gray-400 hover:text-gray-600">
+                  {visibleLeads.length > 0 && (
+                    <button onClick={() => { setDismissedAt(new Date().toISOString()); setNotifOpen(false); }} className="text-xs text-gray-400 hover:text-gray-600">
                       Limpar
                     </button>
                   )}
                 </div>
               </div>
               <div className="max-h-64 overflow-y-auto">
-                {hotLeads.length === 0 ? (
+                {visibleLeads.length === 0 ? (
                   <p className="px-4 py-6 text-center text-sm text-gray-400">Sem notificações</p>
                 ) : (
-                  hotLeads.map((lead) => (
+                  visibleLeads.map((lead) => (
                     <div key={lead.id} className="flex items-start gap-3 px-4 py-3 border-b border-gray-50 hover:bg-red-50/50 transition-colors cursor-pointer">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
                         <Flame className="h-4 w-4" />

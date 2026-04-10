@@ -82,19 +82,21 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Olá, <span className="gradient-text">{user?.name?.split(" ")[0] ?? "Dr."}</span>
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">Resumo da sua clínica hoje</p>
-        </div>
-        {activeAgents > 0 && (
-          <div className="hidden sm:flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 border border-emerald-100">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-sm font-medium text-emerald-700">{activeAgents} agentes ativos</span>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 to-brand-800 px-6 py-6 sm:px-8 sm:py-8">
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              Olá, {user?.name?.split(" ")[0] ?? "Dr."}
+            </h1>
+            <p className="mt-1 text-sm text-white/70">Aqui está o resumo da sua clínica hoje</p>
           </div>
-        )}
+          {activeAgents > 0 && (
+            <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white/20 backdrop-blur-sm px-3 py-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-sm font-medium text-white">{activeAgents} agentes ativos</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Metrics */}
