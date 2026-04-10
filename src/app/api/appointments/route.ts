@@ -46,3 +46,22 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ appointment: data });
 }
+
+export async function PATCH(req: NextRequest) {
+  const body = await req.json();
+  const { id, tenant_id, ...updates } = body;
+
+  if (!id || !tenant_id) {
+    return NextResponse.json({ error: "id e tenant_id obrigatórios" }, { status: 400 });
+  }
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("appointments")
+    .update(updates)
+    .eq("id", id)
+    .eq("tenant_id", tenant_id);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}
