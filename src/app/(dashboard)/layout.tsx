@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import Sidebar from "@/components/layout/sidebar";
 import Topbar from "@/components/layout/topbar";
@@ -10,6 +10,7 @@ import Link from "next/link";
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   if (loading) {
     return (
@@ -29,8 +30,11 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50/50">
-      <Sidebar user={user} />
-      <div className={cn("flex flex-1 flex-col transition-all duration-300", "lg:ml-64")}>
+      <Sidebar user={user} onCollapsedChange={setSidebarCollapsed} />
+      <div className={cn(
+        "flex flex-1 flex-col transition-all duration-300",
+        sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-64"
+      )}>
         <Topbar user={user} />
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">

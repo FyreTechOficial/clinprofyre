@@ -22,11 +22,12 @@ interface SidebarProps {
     name: string;
     email: string;
     avatar?: string;
-    role?: string; // "super_admin" = FYRE operation | "owner" | "admin" | "member" = clinic
+    role?: string;
   };
+  onCollapsedChange?: (collapsed: boolean) => void;
 }
 
-export default function Sidebar({ user }: SidebarProps) {
+export default function Sidebar({ user, onCollapsedChange }: SidebarProps) {
   const router = useRouter();
   const isAdmin = user?.role === "super_admin";
   const { tenant } = useAuth();
@@ -159,7 +160,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
       {/* Collapse toggle */}
       <button
-        onClick={() => setCollapsed((v) => !v)}
+        onClick={() => { setCollapsed((v) => { const next = !v; onCollapsedChange?.(next); return next; }); }}
         className={cn(
           "hidden lg:flex items-center justify-center",
           "h-10 border-t border-gray-100/50 text-gray-400 hover:text-gray-600 hover:bg-gray-50",
