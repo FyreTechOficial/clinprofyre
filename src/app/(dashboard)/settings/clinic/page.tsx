@@ -11,7 +11,7 @@ interface WhatsAppGroup {
 }
 
 export default function ClinicSettingsPage() {
-  const { tenantId, tenant } = useAuth();
+  const { tenantId, tenant, refreshTenant } = useAuth();
   const [form, setForm] = useState({
     name: "",
     address: "",
@@ -57,7 +57,7 @@ export default function ClinicSettingsPage() {
       const data = await res.json();
       if (data.logo_url) {
         setLogoUrl(data.logo_url);
-        window.location.reload(); // Reload to update sidebar
+        await refreshTenant();
       }
     } catch {} finally {
       setUploadingLogo(false);
@@ -78,7 +78,7 @@ export default function ClinicSettingsPage() {
         body: JSON.stringify({ tenant_id: tenantId, alert_group_id: selectedGroupId, alert_group_name: selectedGroupName }),
       });
       setLogoUrl(null);
-      window.location.reload();
+      await refreshTenant();
     } catch {} finally {
       setUploadingLogo(false);
     }

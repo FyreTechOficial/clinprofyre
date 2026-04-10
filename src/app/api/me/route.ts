@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     if (user.tenant_id) {
       const { data: tenants } = await admin
         .from("tenants")
-        .select("id, name, slug, evolution_instance, owner_phone, phone, address, working_hours, alert_group_id, alert_group_name")
+        .select("id, name, slug, evolution_instance, owner_phone, phone, address, working_hours, alert_group_id, alert_group_name, logo_url")
         .eq("id", user.tenant_id)
         .limit(1);
       tenant = tenants?.[0] ?? null;

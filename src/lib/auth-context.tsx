@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 interface AuthUser {
   id: string;
@@ -21,6 +21,7 @@ interface Tenant {
   working_hours?: string;
   alert_group_id?: string;
   alert_group_name?: string;
+  logo_url?: string;
 }
 
 interface AuthContextType {
@@ -29,6 +30,7 @@ interface AuthContextType {
   tenantId: string;
   isAdmin: boolean;
   loading: boolean;
+  refreshTenant: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -37,6 +39,7 @@ const AuthContext = createContext<AuthContextType>({
   tenantId: "",
   isAdmin: false,
   loading: true,
+  refreshTenant: async () => {},
 });
 
 export function useAuth() {
@@ -48,27 +51,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/me");
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-          setTenant(data.tenant);
-        }
-      } catch {} finally {
-        setLoading(false);
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/me");
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        setTenant(data.tenant);
       }
+    } catch {} finally {
+      setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const refreshTenant = useCallback(async () => {
+    await load();
+  }, [load]);
 
   const isAdmin = user?.role === "super_admin";
   const tenantId = user?.tenant_id ?? tenant?.id ?? "";
 
   return (
-    <AuthContext.Provider value={{ user, tenant, tenantId, isAdmin, loading }}>
+    <AuthContext.Provider value={{ user, tenant, tenantId, isAdmin, loading, refreshTenant }}>
       {children}
     </AuthContext.Provider>
   );
