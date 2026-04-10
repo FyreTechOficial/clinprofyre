@@ -23,6 +23,7 @@ import {
   LogOut,
   Loader2,
   AlertCircle,
+  UserCheck,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -39,6 +40,7 @@ interface Conversation {
   messageCount: number;
   score: string;
   stage: string;
+  use_ai?: boolean;
 }
 
 interface Message {
@@ -604,10 +606,45 @@ export default function WhatsAppPage() {
                 </span>
               </div>
             </div>
-            <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 transition-colors">
-              <Phone className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={async () => {
+                  const newState = !(selectedConv.use_ai ?? true);
+                  await fetch("/api/whatsapp/toggle-ai", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tenant_id: tenantId, phone: selectedConv.phone, use_ai: newState }),
+                  });
+                  setConversations((prev) =>
+                    prev.map((c) => c.phone === selectedConv.phone ? { ...c, use_ai: newState } : c)
+                  );
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all",
+                  (selectedConv.use_ai ?? true)
+                    ? "bg-emerald-50 text-emerald-700 hover:bg-red-50 hover:text-red-700"
+                    : "bg-red-50 text-red-700 hover:bg-emerald-50 hover:text-emerald-700"
+                )}
+              >
+                {(selectedConv.use_ai ?? true) ? (
+                  <><UserCheck className="h-3.5 w-3.5" /> Assumir</>
+                ) : (
+                  <><Bot className="h-3.5 w-3.5" /> Reativar IA</>
+                )}
+              </button>
+              <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 transition-colors">
+                <Phone className="h-4 w-4" />
+              </button>
+            </div>
           </div>
+
+          {/* AI status banner */}
+          {!(selectedConv.use_ai ?? true) && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border-b border-amber-100">
+              <UserCheck className="h-4 w-4 text-amber-600" />
+              <span className="text-xs font-medium text-amber-700">Atendimento humano ativo — IA desligada para este paciente</span>
+            </div>
+          )}
 
           {/* Messages */}
           <div

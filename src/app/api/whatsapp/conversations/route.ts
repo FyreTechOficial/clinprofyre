@@ -49,16 +49,17 @@ export async function GET(req: NextRequest) {
 
     const { data: leads } = await supabase
       .from("leads")
-      .select("phone, name, lead_score, pipeline_stage")
+      .select("phone, name, lead_score, pipeline_stage, use_ai")
       .eq("tenant_id", tenantId)
       .in("phone", phones);
 
-    const leadMap = new Map<string, { name: string; score: string; stage: string }>();
+    const leadMap = new Map<string, { name: string; score: string; stage: string; use_ai: boolean }>();
     for (const lead of leads ?? []) {
       leadMap.set(lead.phone, {
         name: lead.name ?? lead.phone,
         score: lead.lead_score ?? "desconhecido",
         stage: lead.pipeline_stage ?? "lead_novo",
+        use_ai: lead.use_ai ?? true,
       });
     }
 
@@ -68,6 +69,7 @@ export async function GET(req: NextRequest) {
         name: leadMap.get(conv.phone)?.name ?? conv.phone,
         score: leadMap.get(conv.phone)?.score ?? "desconhecido",
         stage: leadMap.get(conv.phone)?.stage ?? "lead_novo",
+        use_ai: leadMap.get(conv.phone)?.use_ai ?? true,
       }))
       .sort((a, b) => new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime());
 

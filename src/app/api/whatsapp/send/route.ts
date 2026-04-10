@@ -9,9 +9,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "phone, message e tenant_id obrigatórios" }, { status: 400 });
     }
 
+    const supabase = createAdminClient();
+
+    // Get tenant's evolution instance
+    const { data: tenants } = await supabase
+      .from("tenants")
+      .select("evolution_instance")
+      .eq("id", tenant_id)
+      .limit(1);
+
+    const instance = tenants?.[0]?.evolution_instance || process.env.EVOLUTION_INSTANCE;
     const evolutionUrl = process.env.EVOLUTION_API_URL;
     const evolutionKey = process.env.EVOLUTION_API_KEY;
-    const instance = process.env.EVOLUTION_INSTANCE;
 
     if (!evolutionUrl || !evolutionKey || !instance) {
       return NextResponse.json({ error: "Evolution API não configurada" }, { status: 500 });
@@ -20,14 +29,8 @@ export async function POST(req: NextRequest) {
     // Send via Evolution API
     const response = await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: evolutionKey,
-      },
-      body: JSON.stringify({
-        number: phone,
-        text: message,
-      }),
+      headers: { "Content-Type": "application/json", apikey: evolutionKey },
+      body: JSON.stringify({ number: phone, text: message }),
     });
 
     if (!response.ok) {
@@ -37,13 +40,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Save to Supabase
-    const supabase = createAdminClient();
     await supabase.from("conversations").insert({
       tenant_id,
       phone,
       role: "assistant",
       content: message,
     });
+
+    // Desativar IA para este lead (humano assumiu)
+    await supabase
+      .from("leads")
+      .update({ use_ai: false })
+      .eq("tenant_id", tenant_id)
+      .eq("phone", phone);
 
     return NextResponse.json({ success: true });
   } catch (error) {
