@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils/cn";
-import { Building2, Upload, Loader2, Bell, MessageSquare, Check, RefreshCw } from "lucide-react";
+import { Building2, Upload, Loader2, Bell, MessageSquare, Check, RefreshCw, ImageIcon, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 interface WhatsAppGroup {
@@ -20,6 +20,8 @@ export default function ClinicSettingsPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Alert group
   const [groups, setGroups] = useState<WhatsAppGroup[]>([]);
@@ -40,7 +42,47 @@ export default function ClinicSettingsPage() {
     });
     setSelectedGroupId((tenant as any).alert_group_id || "");
     setSelectedGroupName((tenant as any).alert_group_name || "");
+    setLogoUrl((tenant as any).logo_url || null);
   }, [tenant]);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !tenantId) return;
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("tenant_id", tenantId);
+      const res = await fetch("/api/upload-logo", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.logo_url) {
+        setLogoUrl(data.logo_url);
+        window.location.reload(); // Reload to update sidebar
+      }
+    } catch {} finally {
+      setUploadingLogo(false);
+    }
+  }
+
+  async function handleRemoveLogo() {
+    if (!tenantId) return;
+    setUploadingLogo(true);
+    try {
+      // Just clear the logo_url in the tenant
+      const supabaseUrl = "https://bkihuixqdpfinqeuqrgc.supabase.co";
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+      // Use the API instead
+      await fetch("/api/whatsapp/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant_id: tenantId, alert_group_id: selectedGroupId, alert_group_name: selectedGroupName }),
+      });
+      setLogoUrl(null);
+      window.location.reload();
+    } catch {} finally {
+      setUploadingLogo(false);
+    }
+  }
 
   // Load groups
   async function loadGroups() {
@@ -118,6 +160,37 @@ export default function ClinicSettingsPage() {
         </div>
 
         <form onSubmit={handleSave} className="space-y-5 max-w-2xl">
+          {/* Logo upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Logo da Clínica</label>
+            <div className="flex items-center gap-4">
+              {logoUrl ? (
+                <div className="relative">
+                  <img src={logoUrl} alt="Logo" className="h-16 w-16 rounded-xl object-cover border border-gray-200 shadow-sm" />
+                  <button
+                    type="button"
+                    onClick={handleRemoveLogo}
+                    className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50">
+                  <ImageIcon className="h-6 w-6 text-gray-300" />
+                </div>
+              )}
+              <div>
+                <label className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors">
+                  {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {uploadingLogo ? "Enviando..." : "Enviar Logo"}
+                  <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" disabled={uploadingLogo} />
+                </label>
+                <p className="text-[10px] text-gray-400 mt-1">PNG, JPG ou SVG. Aparece na sidebar e no sistema.</p>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome da Clínica</label>
             <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Clínica Odonto Vida" className={INPUT_CLASS} />
