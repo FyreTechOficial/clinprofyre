@@ -28,7 +28,7 @@ interface DashboardData {
   messagesToday: number;
   hotLeads: number;
   agents: { agent_type: string; enabled: boolean; messages_today: number; executions_total: number }[];
-  recentActivity: { phone: string; role: string; content: string; created_at: string }[];
+  recentActivity: { type: string; text: string; time: string }[];
 }
 
 const AGENT_ICONS: Record<string, any> = {
@@ -56,8 +56,13 @@ export default function DashboardPage() {
     if (!tenantId) return;
     async function load() {
       try {
-        const res = await fetch(`/api/dashboard?tenant_id=${tenantId}`);
-        const d = await res.json();
+        const [dashRes, notifRes] = await Promise.all([
+          fetch(`/api/dashboard?tenant_id=${tenantId}`),
+          fetch(`/api/notifications?tenant_id=${tenantId}`),
+        ]);
+        const d = await dashRes.json();
+        const n = await notifRes.json();
+        d.recentActivity = n.activities ?? [];
         setData(d);
       } catch {} finally {
         setLoading(false);
@@ -169,25 +174,30 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-400 text-center py-8">Nenhuma atividade ainda. Quando pacientes enviarem mensagens, aparecerá aqui.</p>
             ) : (
               <div className="space-y-3">
-                {d.recentActivity.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-xl p-3 hover:bg-gray-50/80 border border-transparent hover:border-gray-100 transition-all">
-                    <div className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
-                      item.role === "user" ? "text-blue-600 bg-blue-50" : "text-brand-600 bg-brand-50"
-                    )}>
-                      {item.role === "user" ? <UserPlus className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                {d.recentActivity.map((item, i) => {
+                  const iconConfig: Record<string, { icon: any; color: string }> = {
+                    new_lead: { icon: UserPlus, color: "text-blue-600 bg-blue-50" },
+                    appointment: { icon: CalendarCheck, color: "text-emerald-600 bg-emerald-50" },
+                    pipeline: { icon: TrendingUp, color: "text-brand-600 bg-brand-50" },
+                    hot_lead: { icon: TrendingUp, color: "text-red-600 bg-red-50" },
+                  };
+                  const cfg = iconConfig[item.type] ?? { icon: Bot, color: "text-gray-600 bg-gray-50" };
+                  const Icon = cfg.icon;
+                  return (
+                    <div key={i} className="flex items-start gap-3 rounded-xl p-3 hover:bg-gray-50/80 border border-transparent hover:border-gray-100 transition-all">
+                      <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", cfg.color)}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-gray-700 leading-snug">{item.text}</p>
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
+                          <Clock className="h-3 w-3" />
+                          {new Date(item.time).toLocaleString("pt-BR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-gray-700 leading-snug truncate">
-                        <span className="font-medium">{item.phone}</span>: {item.content.slice(0, 80)}{item.content.length > 80 ? "..." : ""}
-                      </p>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
-                        <Clock className="h-3 w-3" />
-                        {new Date(item.created_at).toLocaleString("pt-BR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>

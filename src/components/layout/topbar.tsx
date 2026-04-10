@@ -118,11 +118,18 @@ export default function Topbar({ user }: TopbarProps) {
             <div className={cn("absolute right-0 mt-2 w-80 rounded-xl border border-gray-100 bg-white shadow-lg animate-slide-up origin-top-right")}>
               <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
                 <p className="text-sm font-bold text-gray-900">Notificações</p>
-                {hotLeads.length > 0 && (
-                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
-                    {hotLeads.length} lead{hotLeads.length > 1 ? "s" : ""} quente{hotLeads.length > 1 ? "s" : ""}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {hotLeads.length > 0 && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
+                      {hotLeads.length}
+                    </span>
+                  )}
+                  {hotLeads.length > 0 && (
+                    <button onClick={() => { setHotLeads([]); setNotifOpen(false); }} className="text-xs text-gray-400 hover:text-gray-600">
+                      Limpar
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {hotLeads.length === 0 ? (
