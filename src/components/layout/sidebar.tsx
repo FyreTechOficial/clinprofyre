@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils/cn";
 import { navItems, adminNavItems } from "@/constants/nav-items";
 import { Avatar } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 
 export interface NavItem {
   label: string;
@@ -28,6 +29,7 @@ interface SidebarProps {
 export default function Sidebar({ user }: SidebarProps) {
   const router = useRouter();
   const isAdmin = user?.role === "super_admin";
+  const { tenant } = useAuth();
 
   async function handleLogout() {
     const supabase = createClient();
@@ -46,12 +48,20 @@ export default function Sidebar({ user }: SidebarProps) {
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 px-4 border-b border-gray-100/50">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-600/30">
-          CP
-        </div>
+        {tenant && (tenant as any).logo_url ? (
+          <img
+            src={(tenant as any).logo_url}
+            alt={tenant.name}
+            className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-lg shadow-brand-600/20"
+          />
+        ) : (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-600/30">
+            CP
+          </div>
+        )}
         {!collapsed && (
           <span className="text-lg font-bold text-gray-900 tracking-tight whitespace-nowrap">
-            Clin<span className="gradient-text">PRO</span>
+            {tenant?.name ? tenant.name : (<>Clin<span className="gradient-text">PRO</span></>)}
           </span>
         )}
       </div>

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils/cn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Users,
+  Calendar,
   CalendarCheck,
   TrendingUp,
   ArrowUpRight,
@@ -83,19 +84,27 @@ export default function DashboardPage() {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 to-brand-800 px-6 py-6 sm:px-8 sm:py-8">
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              Olá, {user?.name?.split(" ")[0] ?? "Dr."}
-            </h1>
-            <p className="mt-1 text-sm text-white/70">Aqui está o resumo da sua clínica hoje</p>
-          </div>
-          {activeAgents > 0 && (
-            <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white/20 backdrop-blur-sm px-3 py-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-sm font-medium text-white">{activeAgents} agentes ativos</span>
+        <div className="relative z-10 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Olá, {user?.name?.split(" ")[0] ?? "Dr."}
+              </h1>
+              <p className="mt-1 text-sm text-white/70">Aqui está o resumo da sua clínica hoje</p>
             </div>
-          )}
+            {activeAgents > 0 && (
+              <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white/20 backdrop-blur-sm px-3 py-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-sm font-medium text-white">{activeAgents} agentes ativos</span>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <button className="inline-flex items-center gap-2 rounded-xl bg-white/20 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white border border-white/20 hover:bg-white/30 transition-all">
+              <Calendar className="h-4 w-4" />
+              Hoje
+            </button>
+          </div>
         </div>
       </div>
 

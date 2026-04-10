@@ -11,6 +11,7 @@ import {
 } from "@hello-pangea/dnd";
 import { Phone, Sparkles, GripVertical, Clock, User, Bot, Loader2, RefreshCw } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import LeadCardModal from "@/components/lead-card-modal";
 
 interface Lead {
   id: string;
@@ -55,6 +56,7 @@ export default function PipelinePage() {
   const [board, setBoard] = useState<BoardData>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   const { tenantId } = useAuth();
 
@@ -205,12 +207,13 @@ export default function PipelinePage() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               className={cn(
-                                "rounded-xl border bg-white p-3 transition-all duration-200",
+                                "rounded-xl border bg-white p-3 transition-all duration-200 cursor-pointer",
                                 snapshot.isDragging
                                   ? "border-brand-300 shadow-xl shadow-brand-200/40 rotate-1 scale-105"
                                   : "border-gray-100/80 shadow-sm hover:shadow-md hover:border-gray-200",
                               )}
                               style={provided.draggableProps.style}
+                              onClick={() => setSelectedLead(lead)}
                             >
                               <div className="flex items-start gap-2">
                                 <div {...provided.dragHandleProps} className="mt-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing">
@@ -259,6 +262,16 @@ export default function PipelinePage() {
           })}
         </div>
       </DragDropContext>
+
+      {selectedLead && (
+        <LeadCardModal
+          leadId={selectedLead.id}
+          phone={selectedLead.phone}
+          tenantId={tenantId}
+          isOpen={!!selectedLead}
+          onClose={() => setSelectedLead(null)}
+        />
+      )}
     </div>
   );
 }

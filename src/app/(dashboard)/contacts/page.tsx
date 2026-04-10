@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import LeadCardModal from "@/components/lead-card-modal";
 
 interface Contact {
   id: string;
@@ -62,6 +63,7 @@ export default function ContactsPage() {
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
   useEffect(() => {
     if (!tenantId) return;
@@ -155,7 +157,7 @@ export default function ContactsPage() {
               </thead>
               <tbody>
                 {paginated.map((c, i) => (
-                  <tr key={c.id} className="border-b border-gray-50 hover:bg-brand-50/20 transition-colors">
+                  <tr key={c.id} className="border-b border-gray-50 hover:bg-brand-50/20 transition-colors cursor-pointer" onClick={() => setSelectedContact(c)}>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700 text-xs font-bold">
@@ -206,6 +208,16 @@ export default function ContactsPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {selectedContact && (
+        <LeadCardModal
+          leadId={selectedContact.id}
+          phone={selectedContact.phone}
+          tenantId={tenantId}
+          isOpen={!!selectedContact}
+          onClose={() => setSelectedContact(null)}
+        />
       )}
     </div>
   );

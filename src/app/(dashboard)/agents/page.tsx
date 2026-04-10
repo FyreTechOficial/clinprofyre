@@ -7,6 +7,7 @@ import {
   Bot,
   MessageSquare,
   CalendarCheck,
+  Calendar,
   Zap,
   Star,
   UserCheck,
@@ -98,6 +99,8 @@ export default function AgentsPage() {
   const [editingAgent, setEditingAgent] = useState<AgentFlow | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [resetting, setResetting] = useState<string | null>(null);
+  const [dateFrom, setDateFrom] = useState(() => new Date().toISOString().split("T")[0]);
+  const [dateTo, setDateTo] = useState(() => new Date().toISOString().split("T")[0]);
 
   const { tenantId } = useAuth();
 
@@ -279,6 +282,29 @@ export default function AgentsPage() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Date range filter */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+          <Calendar className="h-4 w-4 text-gray-400" />
+          Periodo:
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          />
+          <span className="text-xs text-gray-400">ate</span>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          />
         </div>
       </div>
 
