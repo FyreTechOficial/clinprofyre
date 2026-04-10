@@ -11,6 +11,7 @@ import {
   X,
   Calendar as CalendarIcon,
   Loader2,
+  Ban,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -35,6 +36,17 @@ interface Appointment {
   duration_minutes: number;
   status: string;
   confirmed: boolean;
+}
+
+interface BlockedSlot {
+  id: string;
+  tenant_id: string;
+  date: string;
+  start_time: string | null;
+  end_time: string | null;
+  all_day: boolean;
+  reason: string;
+  created_at: string;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -62,21 +74,30 @@ function StatusBadge({ status }: { status: string }) {
 export default function AppointmentsPage() {
   const { tenantId } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth());
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   const [modalOpen, setModalOpen] = useState(false);
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingBlock, setSavingBlock] = useState(false);
   const [newAppt, setNewAppt] = useState({ patient_name: "", phone: "", procedure: "", professional: "", date: "", time: "" });
+  const [newBlock, setNewBlock] = useState({ date: "", start_time: "", end_time: "", all_day: false, reason: "" });
 
   useEffect(() => {
     if (!tenantId) return;
     async function load() {
       try {
-        const res = await fetch(`/api/appointments?tenant_id=${tenantId}`);
-        const data = await res.json();
-        setAppointments(data.appointments ?? []);
+        const [apptRes, blockRes] = await Promise.all([
+          fetch(`/api/appointments?tenant_id=${tenantId}`),
+          fetch(`/api/appointments/blocked?tenant_id=${tenantId}`),
+        ]);
+        const apptData = await apptRes.json();
+        const blockData = await blockRes.json();
+        setAppointments(apptData.appointments ?? []);
+        setBlockedSlots(blockData.blocked_slots ?? []);
       } catch {} finally {
         setLoading(false);
       }
@@ -98,6 +119,22 @@ export default function AppointmentsPage() {
     });
     return set;
   }, [appointments, month, year]);
+
+  const blockedDays = useMemo(() => {
+    const set = new Set<number>();
+    blockedSlots.forEach((b) => {
+      const d = new Date(b.date + "T12:00:00");
+      if (d.getMonth() === month && d.getFullYear() === year) set.add(d.getDate());
+    });
+    return set;
+  }, [blockedSlots, month, year]);
+
+  const dayBlockedSlots = useMemo(() => {
+    return blockedSlots.filter((b) => {
+      const d = new Date(b.date + "T12:00:00");
+      return d.getDate() === selectedDay && d.getMonth() === month && d.getFullYear() === year;
+    });
+  }, [blockedSlots, selectedDay, month, year]);
 
   const dayAppointments = useMemo(() => {
     return appointments
@@ -138,6 +175,43 @@ export default function AppointmentsPage() {
     }
   }
 
+  async function handleCreateBlock() {
+    if (!newBlock.date || (!newBlock.all_day && (!newBlock.start_time || !newBlock.end_time))) return;
+    setSavingBlock(true);
+    try {
+      await fetch("/api/appointments/blocked", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_id: tenantId,
+          date: newBlock.date,
+          start_time: newBlock.all_day ? null : newBlock.start_time,
+          end_time: newBlock.all_day ? null : newBlock.end_time,
+          all_day: newBlock.all_day,
+          reason: newBlock.reason,
+        }),
+      });
+      const blockRes = await fetch(`/api/appointments/blocked?tenant_id=${tenantId}`);
+      const blockData = await blockRes.json();
+      setBlockedSlots(blockData.blocked_slots ?? []);
+      setBlockModalOpen(false);
+      setNewBlock({ date: "", start_time: "", end_time: "", all_day: false, reason: "" });
+    } catch {} finally {
+      setSavingBlock(false);
+    }
+  }
+
+  async function handleDeleteBlock(id: string) {
+    try {
+      await fetch("/api/appointments/blocked", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, tenant_id: tenantId }),
+      });
+      setBlockedSlots((prev) => prev.filter((b) => b.id !== id));
+    } catch {}
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><Loader2 className="h-6 w-6 animate-spin text-brand-500" /></div>;
   }
@@ -149,10 +223,16 @@ export default function AppointmentsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Agenda</h1>
           <p className="mt-1 text-sm text-gray-500">{appointments.length} agendamentos</p>
         </div>
-        <button onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-brand-600/20 hover:bg-brand-700">
-          <Plus className="h-4 w-4" /> Novo Agendamento
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setBlockModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+            <Ban className="h-4 w-4" /> Bloquear Horário
+          </button>
+          <button onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-brand-600/20 hover:bg-brand-700">
+            <Plus className="h-4 w-4" /> Novo Agendamento
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -179,6 +259,7 @@ export default function AppointmentsPage() {
                 const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
                 const isSelected = day === selectedDay;
                 const hasAppt = appointmentDays.has(day);
+                const hasBlock = blockedDays.has(day);
                 return (
                   <button key={day} onClick={() => setSelectedDay(day)}
                     className={cn(
@@ -186,7 +267,10 @@ export default function AppointmentsPage() {
                       isSelected ? "bg-brand-600 text-white shadow-md" : isToday ? "bg-brand-50 text-brand-700" : "text-gray-700 hover:bg-gray-50",
                     )}>
                     {day}
-                    {hasAppt && <span className={cn("absolute bottom-1.5 h-1.5 w-1.5 rounded-full", isSelected ? "bg-white" : "bg-brand-500")} />}
+                    <div className="absolute bottom-1.5 flex items-center gap-0.5">
+                      {hasAppt && <span className={cn("h-1.5 w-1.5 rounded-full", isSelected ? "bg-white" : "bg-brand-500")} />}
+                      {hasBlock && <span className={cn("h-1.5 w-1.5 rounded-full", isSelected ? "bg-red-200" : "bg-red-500")} />}
+                    </div>
                   </button>
                 );
               })}
@@ -203,7 +287,28 @@ export default function AppointmentsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {dayAppointments.length === 0 && (
+            {dayBlockedSlots.map((block) => (
+              <div key={block.id} className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50/50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+                  <Ban className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-gray-800 truncate">{block.reason || "Horário bloqueado"}</p>
+                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset bg-red-50 text-red-700 ring-red-200">
+                      Bloqueado
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-red-600">
+                    {block.all_day ? "Dia inteiro" : `${block.start_time?.slice(0, 5)} - ${block.end_time?.slice(0, 5)}`}
+                  </p>
+                  <button onClick={() => handleDeleteBlock(block.id)} className="mt-1 text-xs text-red-400 hover:text-red-600 transition-colors">
+                    Remover bloqueio
+                  </button>
+                </div>
+              </div>
+            ))}
+            {dayAppointments.length === 0 && dayBlockedSlots.length === 0 && (
               <p className="text-sm text-gray-400 text-center py-8">Sem agendamentos para este dia</p>
             )}
             {dayAppointments.map((appt) => (
@@ -228,7 +333,7 @@ export default function AppointmentsPage() {
         </Card>
       </div>
 
-      {/* Modal */}
+      {/* Modal Novo Agendamento */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
           <div className="animate-slide-up w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
@@ -272,6 +377,53 @@ export default function AppointmentsPage() {
               <button onClick={handleCreate} disabled={saving || !newAppt.patient_name || !newAppt.date || !newAppt.time}
                 className="w-full rounded-xl bg-brand-600 py-2.5 text-sm font-medium text-white shadow-md hover:bg-brand-700 disabled:opacity-40">
                 {saving ? "Agendando..." : "Agendar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Bloquear Horário */}
+      {blockModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+          <div className="animate-slide-up w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-bold text-gray-900">Bloquear Horário</h2>
+              <button onClick={() => setBlockModalOpen(false)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data *</label>
+                <input type="date" value={newBlock.date} onChange={(e) => setNewBlock({ ...newBlock, date: e.target.value })}
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+              </div>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="all_day" checked={newBlock.all_day} onChange={(e) => setNewBlock({ ...newBlock, all_day: e.target.checked })}
+                  className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500" />
+                <label htmlFor="all_day" className="text-sm font-medium text-gray-700">Dia inteiro</label>
+              </div>
+              {!newBlock.all_day && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Início *</label>
+                    <input type="time" value={newBlock.start_time} onChange={(e) => setNewBlock({ ...newBlock, start_time: e.target.value })}
+                      className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Fim *</label>
+                    <input type="time" value={newBlock.end_time} onChange={(e) => setNewBlock({ ...newBlock, end_time: e.target.value })}
+                      className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                  </div>
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Motivo</label>
+                <input type="text" value={newBlock.reason} onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })} placeholder="Ex: Feriado, reunião, etc."
+                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+              </div>
+              <button onClick={handleCreateBlock} disabled={savingBlock || !newBlock.date || (!newBlock.all_day && (!newBlock.start_time || !newBlock.end_time))}
+                className="w-full rounded-xl bg-red-600 py-2.5 text-sm font-medium text-white shadow-md hover:bg-red-700 disabled:opacity-40">
+                {savingBlock ? "Bloqueando..." : "Bloquear"}
               </button>
             </div>
           </div>
