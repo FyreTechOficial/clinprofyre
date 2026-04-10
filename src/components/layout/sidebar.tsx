@@ -52,7 +52,7 @@ export default function Sidebar({ user }: SidebarProps) {
           <img
             src={(tenant as any).logo_url}
             alt={tenant.name}
-            className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-lg shadow-brand-600/20"
+            className="h-9 w-9 shrink-0 rounded-xl object-contain"
           />
         ) : (
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white font-bold text-sm shadow-lg shadow-brand-600/30">
