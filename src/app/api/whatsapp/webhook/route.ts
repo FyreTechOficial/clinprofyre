@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Find tenant by instance name (multi-tenant)
-    let tenantId = process.env.NEXT_PUBLIC_TENANT_ID ?? "";
+    // Find tenant by instance name ONLY (multi-tenant safe)
+    let tenantId = "";
 
     if (instanceName) {
       const { data: tenants } = await supabase
@@ -74,8 +74,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Se não encontrou tenant pela instância, não salvar (evita misturar dados)
     if (!tenantId) {
-      return NextResponse.json({ ok: true });
+      console.log("[WEBHOOK] Tenant not found for instance:", instanceName);
+      return NextResponse.json({ ok: true, skipped: "tenant_not_found" });
     }
 
     // Avoid duplicates
