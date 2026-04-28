@@ -275,7 +275,7 @@ export default function WhatsAppPage() {
     if (conversations.length === 0) return;
     conversations.forEach((conv) => {
       if (profilePhotos[conv.phone]) return;
-      fetch(`/api/whatsapp/profile-photo?phone=${conv.phone}`)
+      fetch(`/api/whatsapp/profile-photo?phone=${conv.phone}&tenant_id=${tenantId}`)
         .then((r) => r.json())
         .then((data) => {
           if (data.photoUrl) {
