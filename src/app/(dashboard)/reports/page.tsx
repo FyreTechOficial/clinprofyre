@@ -46,14 +46,14 @@ interface MetricProps {
 function MetricCard({ title, value, icon: Icon, gradient, delay }: MetricProps) {
   return (
     <div
-      className="animate-slide-up group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+      className="animate-slide-up group relative overflow-hidden rounded-2xl border border-hairline bg-canvas p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
       style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
     >
       <div className={cn("absolute inset-0 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity", gradient)} />
       <div className="relative flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="mt-1.5 text-2xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm font-medium text-ink-secondary">{title}</p>
+          <p className="mt-1.5 text-2xl font-bold text-ink">{value}</p>
         </div>
         <div className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", gradient)}>
           <Icon className="h-5 w-5 text-white" />
@@ -131,25 +131,25 @@ export default function ReportsPage() {
     <div className="animate-fade-in space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Relatórios</h1>
-          <p className="mt-1 text-sm text-gray-500">Dados reais da sua clínica</p>
+          <h1 className="text-2xl font-bold text-ink">Relatórios</h1>
+          <p className="mt-1 text-sm text-ink-secondary">Dados reais da sua clínica</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-gray-400" />
+            <CalendarDays className="h-4 w-4 text-ink-tertiary" />
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500"
+              className="rounded-xl border border-divider bg-canvas px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500"
               placeholder="De"
             />
-            <span className="text-xs text-gray-400">até</span>
+            <span className="text-xs text-ink-tertiary">até</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500"
+              className="rounded-xl border border-divider bg-canvas px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500"
               placeholder="Até"
             />
           </div>
@@ -170,14 +170,14 @@ export default function ReportsPage() {
           {d.agents.map((agent, i) => (
             <div
               key={agent.agent_type}
-              className="animate-slide-up rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center"
+              className="animate-slide-up rounded-2xl border border-hairline bg-canvas p-4 shadow-sm text-center"
               style={{ animationDelay: `${300 + i * 60}ms`, animationFillMode: "both" }}
             >
               <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600 mb-2">
                 <Bot className="h-5 w-5" />
               </div>
-              <p className="text-xl font-bold text-gray-900">{agent.messages_today}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{AGENT_LABELS[agent.agent_type] ?? agent.agent_type}</p>
+              <p className="text-xl font-bold text-ink">{agent.messages_today}</p>
+              <p className="text-xs text-ink-secondary mt-0.5">{AGENT_LABELS[agent.agent_type] ?? agent.agent_type}</p>
             </div>
           ))}
         </div>
@@ -189,7 +189,7 @@ export default function ReportsPage() {
           <CardHeader><CardTitle>Score dos Leads</CardTitle></CardHeader>
           <CardContent>
             {totalLeads === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Sem leads ainda</p>
+              <p className="text-sm text-ink-tertiary text-center py-8">Sem leads ainda</p>
             ) : (
               <>
                 <div className="h-52">
@@ -218,8 +218,8 @@ export default function ReportsPage() {
                   ].map((s) => (
                     <div key={s.label} className="flex items-center gap-1.5">
                       <span className="h-3 w-3 rounded-full" style={{ backgroundColor: s.color }} />
-                      <span className="text-xs font-medium text-gray-600">{s.label}</span>
-                      <span className="text-xs font-bold text-gray-900">{s.value}</span>
+                      <span className="text-xs font-medium text-ink-secondary">{s.label}</span>
+                      <span className="text-xs font-bold text-ink">{s.value}</span>
                     </div>
                   ))}
                 </div>
@@ -233,7 +233,7 @@ export default function ReportsPage() {
           <CardHeader><CardTitle>Leads por Origem</CardTitle></CardHeader>
           <CardContent>
             {sources.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Sem dados</p>
+              <p className="text-sm text-ink-tertiary text-center py-8">Sem dados</p>
             ) : (
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -261,13 +261,13 @@ export default function ReportsPage() {
           <CardHeader><CardTitle>Leads por Origem</CardTitle></CardHeader>
           <CardContent>
             {sources.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Sem dados ainda</p>
+              <p className="text-sm text-ink-tertiary text-center py-8">Sem dados ainda</p>
             ) : (
               <div className="space-y-3">
                 {sources.map(([source, count]) => (
-                  <div key={source} className="flex items-center justify-between rounded-xl bg-gray-50/80 px-4 py-2.5">
-                    <span className="text-sm font-medium text-gray-700 capitalize">{source}</span>
-                    <span className="text-sm font-bold text-gray-900">{count}</span>
+                  <div key={source} className="flex items-center justify-between rounded-xl bg-parchment/80 px-4 py-2.5">
+                    <span className="text-sm font-medium text-ink capitalize">{source}</span>
+                    <span className="text-sm font-bold text-ink">{count}</span>
                   </div>
                 ))}
               </div>
@@ -280,13 +280,13 @@ export default function ReportsPage() {
           <CardHeader><CardTitle>Distribuição no Pipeline</CardTitle></CardHeader>
           <CardContent>
             {stages.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Sem leads no pipeline ainda</p>
+              <p className="text-sm text-ink-tertiary text-center py-8">Sem leads no pipeline ainda</p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {stages.map(([stage, count]) => (
-                  <div key={stage} className="rounded-xl border border-gray-100 bg-white p-4 text-center shadow-sm">
-                    <p className="text-2xl font-bold text-gray-900">{count}</p>
-                    <p className="text-xs text-gray-500 mt-1 capitalize">{stage.replace("_", " ")}</p>
+                  <div key={stage} className="rounded-xl border border-hairline bg-canvas p-4 text-center shadow-sm">
+                    <p className="text-2xl font-bold text-ink">{count}</p>
+                    <p className="text-xs text-ink-secondary mt-1 capitalize">{stage.replace("_", " ")}</p>
                   </div>
                 ))}
               </div>

@@ -1,56 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
-import { cn } from "@/lib/utils/cn";
-import Sidebar from "@/components/layout/sidebar";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Topbar from "@/components/layout/topbar";
+import DockNav from "@/components/layout/dock";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
-import { Loader2, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { user, loading, isAdmin } = useAuth();
+  const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50/50">
+      <div className="flex h-screen items-center justify-center bg-parchment">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 text-brand-600 animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Carregando...</p>
+          <Loader2 className="h-6 w-6 text-brand-700 animate-spin mx-auto mb-3" />
+          <p className="text-[14px] text-ink-tertiary">Carregando...</p>
         </div>
       </div>
     );
   }
 
-  if (!user) {
-    if (typeof window !== "undefined") window.location.href = "/login";
-    return null;
-  }
-
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50/50">
-      <Sidebar user={user} onCollapsedChange={setSidebarCollapsed} />
-      <div className={cn(
-        "flex flex-1 flex-col transition-all duration-300",
-        sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-64"
-      )}>
-        <Topbar user={user} />
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
-            {children}
-          </div>
-        </main>
-      </div>
-
-      {/* Clin.IA FAB */}
-      <Link
-        href="/clin-ia"
-        title="Clin.IA"
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-300/40 transition-transform duration-200 hover:scale-110"
-      >
-        <Sparkles className="h-6 w-6" />
-      </Link>
+    <div className="flex h-screen flex-col overflow-hidden bg-parchment">
+      <Topbar user={user} />
+      <main className="flex-1 overflow-y-auto pb-20">
+        <div className="px-4 py-6 lg:px-8">
+          {children}
+        </div>
+      </main>
+      <DockNav isAdmin={isAdmin} />
     </div>
   );
 }

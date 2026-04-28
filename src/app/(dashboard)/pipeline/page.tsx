@@ -9,7 +9,7 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd";
-import { Phone, Sparkles, GripVertical, Clock, User, Bot, Loader2, RefreshCw } from "lucide-react";
+import { Phone, Sparkles, GripVertical, Clock, User, Bot, Loader2, RefreshCw, TrendingUp, Users, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import LeadCardModal from "@/components/lead-card-modal";
 
@@ -69,7 +69,6 @@ export default function PipelinePage() {
       const data = await res.json();
       const leads: Lead[] = data.leads ?? [];
 
-      // Group by stage
       const grouped: BoardData = {};
       for (const stage of pipelineStages) {
         grouped[stage.id] = [];
@@ -86,7 +85,6 @@ export default function PipelinePage() {
     }
   }, [tenantId]);
 
-  // Initial load + poll every 10s
   useEffect(() => {
     fetchLeads(true);
     const interval = setInterval(() => fetchLeads(false), 10000);
@@ -94,6 +92,8 @@ export default function PipelinePage() {
   }, [fetchLeads]);
 
   const totalLeads = Object.values(board).reduce((acc, leads) => acc + leads.length, 0);
+  const hotLeads = Object.values(board).flat().filter((l) => l.lead_score === "quente").length;
+  const warmLeads = Object.values(board).flat().filter((l) => l.lead_score === "morno").length;
 
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId } = result;
@@ -108,14 +108,12 @@ export default function PipelinePage() {
     const [moved] = sourceCol.splice(source.index, 1);
     destCol.splice(destination.index, 0, moved);
 
-    // Optimistic update
     setBoard((prev) => ({
       ...prev,
       [source.droppableId]: sourceCol,
       ...(source.droppableId !== destination.droppableId && { [destination.droppableId]: destCol }),
     }));
 
-    // Save to Supabase if stage changed
     if (source.droppableId !== destination.droppableId) {
       try {
         await fetch("/api/pipeline", {
@@ -135,47 +133,91 @@ export default function PipelinePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-brand-700" />
       </div>
     );
   }
 
   return (
     <div className="animate-fade-in space-y-5">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Pipeline</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {totalLeads} leads no funil &middot; Atualiza em tempo real conforme a IA qualifica
+          <h1 className="text-[21px] font-semibold text-ink tracking-tight">Pipeline</h1>
+          <p className="mt-0.5 text-[14px] text-ink-secondary">
+            Funil de vendas com movimentação automática por IA
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => fetchLeads(false)}
             disabled={refreshing}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all"
+            className="inline-flex items-center gap-1.5 rounded-full border border-divider bg-canvas px-4 py-2 text-[13px] font-medium text-ink-secondary hover:bg-parchment transition-all active:scale-[0.97]"
           >
             <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
             Atualizar
           </button>
-          <div className="hidden sm:flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 border border-brand-100">
-            <Bot className="h-3.5 w-3.5 text-brand-600" />
-            <span className="text-xs font-medium text-brand-700">IA movimenta automaticamente</span>
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="flex items-center gap-3 rounded-[14px] bg-canvas border border-divider px-4 py-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-brand-50 text-brand-700">
+            <Users className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">Total</p>
+            <p className="text-[20px] font-bold text-ink leading-none mt-0.5">{totalLeads}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-[14px] bg-canvas border border-divider px-4 py-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-emerald-50 text-emerald-600">
+            <TrendingUp className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">Quentes</p>
+            <p className="text-[20px] font-bold text-ink leading-none mt-0.5">{hotLeads}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-[14px] bg-canvas border border-divider px-4 py-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-amber-50 text-amber-600">
+            <Zap className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">Mornos</p>
+            <p className="text-[20px] font-bold text-ink leading-none mt-0.5">{warmLeads}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-[14px] bg-canvas border border-divider px-4 py-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-brand-50 text-brand-700">
+            <Bot className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">IA ativa</p>
+            <p className="text-[13px] font-semibold text-brand-700 leading-none mt-1">Movimenta auto</p>
           </div>
         </div>
       </div>
 
-      {/* Stage summary */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {pipelineStages.map((stage) => (
-          <div key={stage.id} className="flex items-center gap-1.5 rounded-lg bg-white border border-gray-100 px-2.5 py-1.5 shrink-0">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
-            <span className="text-xs font-medium text-gray-600">{stage.label}</span>
-            <span className="text-xs font-bold text-gray-900">{(board[stage.id] ?? []).length}</span>
-          </div>
-        ))}
+      {/* Stage pills */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1">
+        {pipelineStages.map((stage) => {
+          const count = (board[stage.id] ?? []).length;
+          return (
+            <div
+              key={stage.id}
+              className="flex items-center gap-1.5 rounded-full bg-canvas border border-divider px-3 py-1.5 shrink-0 transition-all hover:border-hairline"
+            >
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: stage.color }} />
+              <span className="text-[12px] font-medium text-ink-secondary">{stage.label}</span>
+              <span className="text-[12px] font-bold text-ink">{count}</span>
+            </div>
+          );
+        })}
       </div>
 
+      {/* Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 lg:-mx-8 lg:px-8">
           {pipelineStages.map((stage) => {
@@ -187,19 +229,23 @@ export default function PipelinePage() {
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className={cn(
-                      "flex w-72 shrink-0 flex-col rounded-2xl transition-all duration-200",
-                      snapshot.isDraggingOver ? "bg-brand-50/50 ring-2 ring-brand-200" : "bg-gray-50/80",
+                      "flex w-72 shrink-0 flex-col rounded-[18px] border transition-all duration-200",
+                      snapshot.isDraggingOver
+                        ? "bg-brand-50/30 border-brand-200 ring-2 ring-brand-100"
+                        : "bg-canvas/50 border-divider",
                     )}
                   >
-                    <div className="flex items-center gap-2.5 px-4 py-3">
-                      <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: stage.color }} />
-                      <span className="text-sm font-bold text-gray-800">{stage.label}</span>
-                      <span className="ml-auto flex h-6 min-w-[24px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-gray-600 shadow-sm">
+                    {/* Column header */}
+                    <div className="flex items-center gap-2.5 px-4 py-3 border-b border-divider/60">
+                      <div className="h-2.5 w-2.5 rounded-full ring-2 ring-canvas" style={{ backgroundColor: stage.color }} />
+                      <span className="text-[13px] font-semibold text-ink">{stage.label}</span>
+                      <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-parchment px-1.5 text-[11px] font-bold text-ink-secondary">
                         {leads.length}
                       </span>
                     </div>
 
-                    <div className="flex-1 space-y-2 px-2 pb-3 min-h-[100px]">
+                    {/* Cards */}
+                    <div className="flex-1 space-y-2 p-2 min-h-[120px]">
                       {leads.map((lead, index) => (
                         <Draggable key={lead.id} draggableId={lead.id} index={index}>
                           {(provided, snapshot) => (
@@ -207,36 +253,36 @@ export default function PipelinePage() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               className={cn(
-                                "rounded-xl border bg-white p-3 transition-all duration-200 cursor-pointer",
+                                "rounded-[14px] border bg-canvas p-3 transition-all duration-200 cursor-pointer group",
                                 snapshot.isDragging
-                                  ? "border-brand-300 shadow-xl shadow-brand-200/40 rotate-1 scale-105"
-                                  : "border-gray-100/80 shadow-sm hover:shadow-md hover:border-gray-200",
+                                  ? "border-brand-300 shadow-xl shadow-brand-200/30 rotate-1 scale-[1.03]"
+                                  : "border-divider hover:border-hairline hover:shadow-sm",
                               )}
                               style={provided.draggableProps.style}
                               onClick={() => setSelectedLead(lead)}
                             >
                               <div className="flex items-start gap-2">
-                                <div {...provided.dragHandleProps} className="mt-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing">
+                                <div {...provided.dragHandleProps} className="mt-0.5 text-ink-tertiary opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
                                   <GripVertical className="h-3.5 w-3.5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center justify-between gap-1">
-                                    <p className="text-sm font-semibold text-gray-800 truncate">{lead.name}</p>
+                                    <p className="text-[13px] font-semibold text-ink truncate">{lead.name}</p>
                                     <ScoreBadge score={lead.lead_score} />
                                   </div>
-                                  <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
+                                  <p className="mt-1 flex items-center gap-1 text-[12px] text-ink-tertiary">
                                     <Phone className="h-3 w-3" />
                                     {lead.phone.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, "+$1 ($2) $3-$4")}
                                   </p>
                                   <div className="mt-2 flex items-center justify-between gap-1">
                                     {lead.procedure_interest ? (
-                                      <span className="rounded-lg bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-500 truncate">
+                                      <span className="rounded-full bg-parchment px-2 py-0.5 text-[11px] font-medium text-ink-secondary truncate max-w-[140px]">
                                         {lead.procedure_interest}
                                       </span>
                                     ) : (
-                                      <span className="text-[10px] text-gray-300">Sem interesse definido</span>
+                                      <span className="text-[10px] text-ink-tertiary italic">Sem interesse</span>
                                     )}
-                                    <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                                    <span className="flex items-center gap-0.5 text-[10px] text-ink-tertiary shrink-0">
                                       <Clock className="h-2.5 w-2.5" />
                                       {timeAgo(lead.last_interaction)}
                                     </span>
@@ -249,9 +295,12 @@ export default function PipelinePage() {
                       ))}
                       {provided.placeholder}
                       {leads.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-8 text-gray-300">
-                          <User className="h-8 w-8 mb-1" />
-                          <p className="text-xs">Sem leads</p>
+                        <div className="flex flex-col items-center justify-center py-10 text-ink-tertiary">
+                          <div className="h-10 w-10 rounded-full bg-parchment flex items-center justify-center mb-2">
+                            <User className="h-5 w-5" />
+                          </div>
+                          <p className="text-[12px] font-medium">Sem leads</p>
+                          <p className="text-[11px] text-ink-tertiary mt-0.5">Nesta etapa</p>
                         </div>
                       )}
                     </div>

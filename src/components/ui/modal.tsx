@@ -53,62 +53,58 @@ function Modal({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
         aria-hidden
       />
 
-      {/* Panel */}
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
         aria-describedby={description ? "modal-desc" : undefined}
         className={cn(
-          "relative z-10 w-full rounded-2xl bg-white shadow-xl",
+          "relative z-10 w-full rounded-[22px] bg-canvas",
           "animate-slide-up",
-          "border border-gray-100",
+          "border border-divider",
+          "shadow-xl shadow-black/8",
           sizeStyles[size],
           className,
         )}
       >
-        {/* Header */}
         {(title || description) && (
           <div className="px-6 pt-6 pb-2">
             {title && (
               <h2
                 id="modal-title"
-                className="text-lg font-semibold text-gray-900"
+                className="text-[17px] font-semibold text-ink tracking-tight"
               >
                 {title}
               </h2>
             )}
             {description && (
-              <p id="modal-desc" className="mt-1 text-sm text-gray-500">
+              <p id="modal-desc" className="mt-1 text-[14px] text-ink-secondary">
                 {description}
               </p>
             )}
           </div>
         )}
 
-        {/* Close button */}
         <button
           onClick={onClose}
           className={cn(
-            "absolute right-4 top-4 rounded-lg p-1.5",
-            "text-gray-400 hover:text-gray-600 hover:bg-gray-100",
+            "absolute right-4 top-4 rounded-full p-1.5",
+            "text-ink-tertiary hover:text-ink hover:bg-parchment",
             "transition-colors duration-150",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
           )}
-          aria-label="Cerrar"
+          aria-label="Fechar"
         >
           <X className="h-4 w-4" />
         </button>
 
-        {/* Body */}
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-6 py-5">{children}</div>
       </div>
     </div>,
     document.body,

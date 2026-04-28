@@ -63,8 +63,8 @@ export default function AdminPage() {
             <Shield className="h-5 w-5 text-brand-600" />
             <span className="text-xs font-bold text-brand-600 uppercase tracking-wider">Admin FYRE</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Painel de Clínicas</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-ink">Painel de Clínicas</h1>
+          <p className="mt-1 text-sm text-ink-secondary">
             Gerencie todas as clínicas cadastradas no ClinPRO
           </p>
         </div>
@@ -87,12 +87,12 @@ export default function AdminPage() {
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div key={stat.label} className="rounded-2xl border border-hairline bg-canvas p-4 shadow-sm">
               <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl mb-2", stat.color)}>
                 <Icon className="h-5 w-5" />
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
+              <p className="text-2xl font-bold text-ink">{stat.value}</p>
+              <p className="text-xs text-ink-secondary mt-0.5">{stat.label}</p>
             </div>
           );
         })}
@@ -100,33 +100,33 @@ export default function AdminPage() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-tertiary" />
         <input
           type="text"
           placeholder="Buscar clínica..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 py-2.5 text-sm placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
+          className="w-full rounded-xl border border-divider bg-canvas pl-10 pr-4 py-2.5 text-sm placeholder:text-ink-tertiary focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
         />
       </div>
 
       {/* Clinic list */}
       <div className="space-y-3">
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Carregando...</div>
+          <div className="text-center py-12 text-ink-tertiary">Carregando...</div>
         ) : filtered.length === 0 ? (
           <Card className="!shadow-sm">
             <CardContent className="py-12 text-center">
-              <Building2 className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 font-medium">Nenhuma clínica cadastrada</p>
-              <p className="text-sm text-gray-400 mt-1">Clique em &quot;Nova Clínica&quot; para começar o onboarding</p>
+              <Building2 className="h-12 w-12 text-ink-tertiary mx-auto mb-3" />
+              <p className="text-ink-secondary font-medium">Nenhuma clínica cadastrada</p>
+              <p className="text-sm text-ink-tertiary mt-1">Clique em &quot;Nova Clínica&quot; para começar o onboarding</p>
             </CardContent>
           </Card>
         ) : (
           filtered.map((tenant, i) => (
             <div
               key={tenant.id}
-              className="animate-slide-up flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-gray-200 cursor-pointer"
+              className="animate-slide-up flex items-center gap-4 rounded-2xl border border-hairline bg-canvas p-4 shadow-sm transition-all hover:shadow-md hover:border-divider cursor-pointer"
               style={{ animationDelay: `${i * 60}ms`, animationFillMode: "both" }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white font-bold text-sm shadow-md">
@@ -134,17 +134,17 @@ export default function AdminPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-gray-900">{tenant.name}</p>
+                  <p className="text-sm font-bold text-ink">{tenant.name}</p>
                   <span className={cn(
                     "rounded-full px-2 py-0.5 text-[10px] font-bold",
-                    tenant.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"
+                    tenant.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-parchment text-ink-secondary"
                   )}>
                     {tenant.status === "active" ? "Ativo" : "Inativo"}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                <div className="flex items-center gap-3 mt-1 text-xs text-ink-secondary">
                   <span>{tenant.email}</span>
-                  <span className="text-gray-300">&middot;</span>
+                  <span className="text-ink-tertiary">&middot;</span>
                   <span className="flex items-center gap-1">
                     <Smartphone className="h-3 w-3" />
                     {tenant.evolution_instance || "Sem instância"}
@@ -154,9 +154,9 @@ export default function AdminPage() {
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-1">
                   <span className={cn("h-2 w-2 rounded-full", tenant.status === "active" ? "bg-emerald-500" : "bg-gray-300")} />
-                  <span className="text-xs text-gray-400">{tenant.evolution_instance ? "Conectado" : "—"}</span>
+                  <span className="text-xs text-ink-tertiary">{tenant.evolution_instance ? "Conectado" : "—"}</span>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-300" />
+                <ChevronRight className="h-4 w-4 text-ink-tertiary" />
               </div>
             </div>
           ))

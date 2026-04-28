@@ -103,8 +103,8 @@ export default function ContactsPage() {
     <div className="animate-fade-in space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contatos</h1>
-          <p className="mt-1 text-sm text-gray-500">{contacts.length} leads e pacientes</p>
+          <h1 className="text-2xl font-bold text-ink">Contatos</h1>
+          <p className="mt-1 text-sm text-ink-secondary">{contacts.length} leads e pacientes</p>
         </div>
       </div>
 
@@ -116,9 +116,9 @@ export default function ContactsPage() {
           { label: "Mornos", value: contacts.filter((c) => c.lead_score === "morno").length, color: "bg-amber-100 text-amber-700" },
           { label: "Frios", value: contacts.filter((c) => c.lead_score === "frio").length, color: "bg-red-100 text-red-700" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+          <div key={stat.label} className="rounded-xl border border-hairline bg-canvas p-4 shadow-sm text-center">
             <p className={cn("inline-flex items-center justify-center h-10 w-10 rounded-xl text-sm font-bold mx-auto", stat.color)}>{stat.value}</p>
-            <p className="text-xs text-gray-500 mt-1.5 font-medium">{stat.label}</p>
+            <p className="text-xs text-ink-secondary mt-1.5 font-medium">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -126,14 +126,14 @@ export default function ContactsPage() {
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-tertiary" />
           <input type="text" placeholder="Buscar..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+            className="w-full rounded-xl border border-divider bg-canvas py-2.5 pl-10 pr-4 text-sm placeholder:text-ink-tertiary focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
         </div>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-tertiary pointer-events-none" />
           <select value={stageFilter} onChange={(e) => { setStageFilter(e.target.value); setPage(1); }}
-            className="appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100">
+            className="appearance-none rounded-xl border border-divider bg-canvas py-2.5 pl-10 pr-10 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100">
             <option value="all">Todos os estágios</option>
             {pipelineStages.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
@@ -146,44 +146,44 @@ export default function ContactsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/80">
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Paciente</th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Interesse</th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Score</th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pipeline</th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Origem</th>
-                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Atividade</th>
+                <tr className="border-b border-hairline bg-parchment/80">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-ink-secondary uppercase tracking-wider">Paciente</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-ink-secondary uppercase tracking-wider">Interesse</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-ink-secondary uppercase tracking-wider">Score</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-ink-secondary uppercase tracking-wider">Pipeline</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-ink-secondary uppercase tracking-wider">Origem</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-ink-secondary uppercase tracking-wider">Atividade</th>
                 </tr>
               </thead>
               <tbody>
                 {paginated.map((c, i) => (
-                  <tr key={c.id} className="border-b border-gray-50 hover:bg-brand-50/20 transition-colors cursor-pointer" onClick={() => setSelectedContact(c)}>
+                  <tr key={c.id} className="border-b border-hairline hover:bg-brand-50/20 transition-colors cursor-pointer" onClick={() => setSelectedContact(c)}>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700 text-xs font-bold">
                           {(c.name ?? c.phone).split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900">{c.name ?? c.phone}</p>
-                          <p className="text-xs text-gray-400 flex items-center gap-1"><Phone className="h-3 w-3" />{c.phone}</p>
+                          <p className="font-semibold text-ink">{c.name ?? c.phone}</p>
+                          <p className="text-xs text-ink-tertiary flex items-center gap-1"><Phone className="h-3 w-3" />{c.phone}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="rounded-lg bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600">
+                      <span className="rounded-lg bg-parchment px-2 py-1 text-xs font-medium text-ink-secondary">
                         {c.procedure_interest || "—"}
                       </span>
                     </td>
                     <td className="px-5 py-3.5"><ScoreBadge score={c.lead_score ?? "morno"} /></td>
                     <td className="px-5 py-3.5"><StageBadge stageId={c.pipeline_stage ?? "lead_novo"} /></td>
-                    <td className="px-5 py-3.5 text-xs text-gray-500">{c.source || "—"}</td>
-                    <td className="px-5 py-3.5 text-xs text-gray-400">
+                    <td className="px-5 py-3.5 text-xs text-ink-secondary">{c.source || "—"}</td>
+                    <td className="px-5 py-3.5 text-xs text-ink-tertiary">
                       {c.last_interaction ? new Date(c.last_interaction).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—"}
                     </td>
                   </tr>
                 ))}
                 {paginated.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-ink-tertiary">
                     {contacts.length === 0 ? "Nenhum contato ainda. Leads aparecerão aqui quando pacientes mandarem mensagem." : "Nenhum resultado para essa busca."}
                   </td></tr>
                 )}
@@ -196,14 +196,14 @@ export default function ContactsPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">Mostrando {paginated.length} de {filtered.length}</p>
+          <p className="text-sm text-ink-secondary">Mostrando {paginated.length} de {filtered.length}</p>
           <div className="flex items-center gap-2">
             <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-              className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40">
+              className="inline-flex items-center gap-1 rounded-xl border border-divider bg-canvas px-3 py-2 text-sm font-medium text-ink hover:bg-parchment disabled:opacity-40">
               <ChevronLeft className="h-4 w-4" /> Anterior
             </button>
             <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-              className="inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40">
+              className="inline-flex items-center gap-1 rounded-xl border border-divider bg-canvas px-3 py-2 text-sm font-medium text-ink hover:bg-parchment disabled:opacity-40">
               Próximo <ChevronRight className="h-4 w-4" />
             </button>
           </div>

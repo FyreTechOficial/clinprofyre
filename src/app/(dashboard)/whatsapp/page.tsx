@@ -139,8 +139,8 @@ function ConnectionScreen({
       <div className="flex flex-1 items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-10 w-10 text-brand-500 animate-spin mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-700">Verificando conexão...</h3>
-          <p className="text-sm text-gray-400 mt-1">Consultando Evolution API</p>
+          <h3 className="text-lg font-bold text-ink">Verificando conexão...</h3>
+          <p className="text-sm text-ink-tertiary mt-1">Consultando Evolution API</p>
         </div>
       </div>
     );
@@ -149,20 +149,20 @@ function ConnectionScreen({
   return (
     <div className="flex flex-1 items-center justify-center p-6">
       <div className="w-full max-w-md text-center">
-        <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+        <div className="rounded-3xl border border-hairline bg-canvas p-8 shadow-sm">
           {/* QR Code available */}
           {qrBase64 ? (
             <>
               <div className="mx-auto mb-4">
                 <Smartphone className="h-8 w-8 text-emerald-500 mx-auto mb-3" />
-                <h2 className="text-xl font-bold text-gray-900">Conecte seu WhatsApp</h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <h2 className="text-xl font-bold text-ink">Conecte seu WhatsApp</h2>
+                <p className="text-sm text-ink-secondary mt-1">
                   Escaneie o QR Code com seu celular
                 </p>
               </div>
 
               {/* QR Image */}
-              <div className="mx-auto w-64 h-64 rounded-2xl overflow-hidden border-2 border-gray-100 bg-white p-2 mb-4">
+              <div className="mx-auto w-64 h-64 rounded-2xl overflow-hidden border-2 border-hairline bg-canvas p-2 mb-4">
                 <img
                   src={qrBase64}
                   alt="QR Code WhatsApp"
@@ -171,11 +171,11 @@ function ConnectionScreen({
               </div>
 
               <div className="space-y-3 text-left">
-                <div className="rounded-xl bg-gray-50 p-3">
-                  <p className="text-xs font-medium text-gray-600 mb-1">Instância</p>
-                  <p className="text-sm text-gray-800 font-mono">{instanceName}</p>
+                <div className="rounded-xl bg-parchment p-3">
+                  <p className="text-xs font-medium text-ink-secondary mb-1">Instância</p>
+                  <p className="text-sm text-ink font-mono">{instanceName}</p>
                 </div>
-                <ol className="text-xs text-gray-500 space-y-1.5 px-1">
+                <ol className="text-xs text-ink-secondary space-y-1.5 px-1">
                   <li className="flex items-start gap-2">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">1</span>
                     Abra o WhatsApp no celular
@@ -193,7 +193,7 @@ function ConnectionScreen({
 
               <button
                 onClick={onRetry}
-                className="mt-4 inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 w-full justify-center"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl border border-divider bg-canvas px-4 py-2.5 text-sm font-medium text-ink transition-all hover:bg-parchment w-full justify-center"
               >
                 <RefreshCw className="h-4 w-4" />
                 Gerar Novo QR Code
@@ -202,14 +202,14 @@ function ConnectionScreen({
           ) : connectionState === "connecting" ? (
             <>
               <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-900">Gerando QR Code...</h2>
-              <p className="text-sm text-gray-500 mt-1">Aguarde um momento</p>
+              <h2 className="text-xl font-bold text-ink">Gerando QR Code...</h2>
+              <p className="text-sm text-ink-secondary mt-1">Aguarde um momento</p>
             </>
           ) : connectionState === "error" ? (
             <>
               <AlertCircle className="h-10 w-10 text-red-400 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-900">Erro de conexão</h2>
-              <p className="text-sm text-gray-500 mt-1">{errorMsg ?? "Não foi possível conectar à Evolution API"}</p>
+              <h2 className="text-xl font-bold text-ink">Erro de conexão</h2>
+              <p className="text-sm text-ink-secondary mt-1">{errorMsg ?? "Não foi possível conectar à Evolution API"}</p>
               <div className="rounded-xl bg-red-50 p-3 mt-4 text-left">
                 <p className="text-xs text-red-600">Verifique se a Evolution API está rodando e a instância está configurada.</p>
               </div>
@@ -224,12 +224,12 @@ function ConnectionScreen({
           ) : (
             /* disconnected, no QR yet */
             <>
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gray-100 mb-6">
-                <WifiOff className="h-10 w-10 text-gray-400" />
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-parchment mb-6">
+                <WifiOff className="h-10 w-10 text-ink-tertiary" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">WhatsApp Desconectado</h2>
-              <p className="text-sm text-gray-500 mt-1 mb-6">
-                Sua instância <span className="font-mono text-gray-700">{instanceName}</span> não está conectada
+              <h2 className="text-xl font-bold text-ink">WhatsApp Desconectado</h2>
+              <p className="text-sm text-ink-secondary mt-1 mb-6">
+                Sua instância <span className="font-mono text-ink">{instanceName}</span> não está conectada
               </p>
               <button
                 onClick={onRetry}
@@ -493,21 +493,21 @@ export default function WhatsAppPage() {
 
   /* ---------- CONNECTED: show chat ---------- */
   return (
-    <div className="animate-fade-in flex h-[calc(100vh-4rem)] -mx-4 -my-6 lg:-mx-8 overflow-hidden rounded-none lg:rounded-2xl lg:mx-0 lg:my-0 lg:h-[calc(100vh-7rem)] border border-gray-200 bg-white shadow-sm">
+    <div className="animate-fade-in flex h-[calc(100vh-4rem)] -mx-4 -my-6 lg:-mx-8 overflow-hidden rounded-none lg:rounded-2xl lg:mx-0 lg:my-0 lg:h-[calc(100vh-7rem)] border border-divider bg-canvas shadow-sm">
 
       {/* Conversation list */}
       <div className={cn(
-        "flex flex-col border-r border-gray-100 bg-white w-full sm:w-80 shrink-0",
+        "flex flex-col border-r border-hairline bg-canvas w-full sm:w-80 shrink-0",
         selectedPhone ? "hidden sm:flex" : "flex"
       )}>
         {/* Header */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-hairline">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 text-white" />
               </div>
-              <h2 className="text-base font-bold text-gray-900">Conversas</h2>
+              <h2 className="text-base font-bold text-ink">Conversas</h2>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5">
@@ -516,7 +516,7 @@ export default function WhatsAppPage() {
               </div>
               <button
                 onClick={handleLogout}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                className="rounded-lg p-1.5 text-ink-tertiary hover:bg-red-50 hover:text-red-500 transition-colors"
                 title="Desconectar WhatsApp"
               >
                 <LogOut className="h-4 w-4" />
@@ -524,13 +524,13 @@ export default function WhatsAppPage() {
             </div>
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-tertiary" />
             <input
               type="text"
               placeholder="Buscar conversa..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl bg-gray-50 border border-gray-100 pl-9 pr-4 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300 transition-all"
+              className="w-full rounded-xl bg-parchment border border-hairline pl-9 pr-4 py-2 text-sm placeholder:text-ink-tertiary focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300 transition-all"
             />
           </div>
         </div>
@@ -542,15 +542,15 @@ export default function WhatsAppPage() {
               key={conv.phone}
               onClick={() => setSelectedPhone(conv.phone)}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 cursor-pointer transition-all border-b border-gray-50",
-                selectedPhone === conv.phone ? "bg-emerald-50/80" : "hover:bg-gray-50/80"
+                "flex items-center gap-3 px-4 py-3 cursor-pointer transition-all border-b border-hairline",
+                selectedPhone === conv.phone ? "bg-emerald-50/80" : "hover:bg-parchment/80"
               )}
             >
               <div className="relative shrink-0">
                 {profilePhotos[conv.phone] ? (
                   <img src={profilePhotos[conv.phone]} alt={conv.name} className="h-11 w-11 rounded-full object-cover" />
                 ) : (
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-sm font-bold text-gray-600">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-parchment to-surface-raised text-sm font-bold text-ink-secondary">
                     {getInitials(conv.name)}
                   </div>
                 )}
@@ -558,9 +558,9 @@ export default function WhatsAppPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{conv.name}</p>
+                  <p className="text-sm font-semibold text-ink truncate">{conv.name}</p>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[10px] text-gray-400">{formatTime(conv.lastAt)}</span>
+                    <span className="text-[10px] text-ink-tertiary">{formatTime(conv.lastAt)}</span>
                     {conv.lastRole === "user" && (
                       <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
                     )}
@@ -568,13 +568,13 @@ export default function WhatsAppPage() {
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
                   {conv.lastRole === "assistant" && <CheckCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />}
-                  <p className="text-xs text-gray-500 truncate">{conv.lastMessage}</p>
+                  <p className="text-xs text-ink-secondary truncate">{conv.lastMessage}</p>
                 </div>
               </div>
             </div>
           ))}
           {filteredConversations.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-16 text-ink-tertiary">
               <MessageCircle className="h-8 w-8 mb-2" />
               <p className="text-sm">Nenhuma conversa</p>
             </div>
@@ -586,25 +586,25 @@ export default function WhatsAppPage() {
       {selectedPhone && selectedConv ? (
         <div className="flex flex-1 flex-col">
           {/* Chat header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white">
-            <button onClick={() => setSelectedPhone(null)} className="sm:hidden rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-hairline bg-canvas">
+            <button onClick={() => setSelectedPhone(null)} className="sm:hidden rounded-lg p-1 text-ink-secondary hover:bg-parchment">
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="relative">
               {profilePhotos[selectedConv.phone] ? (
                 <img src={profilePhotos[selectedConv.phone]} alt={selectedConv.name} className="h-10 w-10 rounded-full object-cover" />
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 text-sm font-bold text-gray-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-parchment to-surface-raised text-sm font-bold text-ink-secondary">
                   {getInitials(selectedConv.name)}
                 </div>
               )}
               <span className="absolute -bottom-0.5 -right-0.5 text-xs leading-none">{getScoreEmoji(selectedConv.score)}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-gray-900">{selectedConv.name}</p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <p className="text-sm font-bold text-ink">{selectedConv.name}</p>
+              <div className="flex items-center gap-2 text-xs text-ink-secondary">
                 <span>{selectedConv.phone.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, "+$1 ($2) $3-$4")}</span>
-                <span className="text-gray-300">&middot;</span>
+                <span className="text-ink-tertiary">&middot;</span>
                 <span className="font-medium">
                   {selectedConv.score === "quente" ? "\u{1F525} Quente" : selectedConv.score === "morno" ? "\u{1F7E1} Morno" : "\u{2744}\uFE0F Frio"}
                 </span>
@@ -654,7 +654,7 @@ export default function WhatsAppPage() {
           >
             {loadingMsgs ? (
               <div className="flex items-center justify-center h-full">
-                <div className="flex items-center gap-2 text-gray-400">
+                <div className="flex items-center gap-2 text-ink-tertiary">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-sm">Carregando...</span>
                 </div>
@@ -663,7 +663,7 @@ export default function WhatsAppPage() {
               <>
                 {messages.map((msg) => (
                   <div key={msg.id} className={cn("flex mb-1", msg.role === "user" ? "justify-start" : "justify-end")}>
-                    <div className={cn("max-w-[75%] rounded-2xl px-3 py-2 shadow-sm", msg.role === "user" ? "bg-white text-gray-800 rounded-tl-md" : "bg-emerald-100 text-gray-800 rounded-tr-md")}>
+                    <div className={cn("max-w-[75%] rounded-2xl px-3 py-2 shadow-sm", msg.role === "user" ? "bg-canvas text-ink rounded-tl-md" : "bg-emerald-100 text-ink rounded-tr-md")}>
                       {msg.role === "assistant" && (
                         <div className="flex items-center gap-1 mb-0.5">
                           <Bot className="h-3 w-3 text-emerald-600" />
@@ -672,7 +672,7 @@ export default function WhatsAppPage() {
                       )}
                       <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       <div className="flex items-center gap-1 mt-1 justify-end">
-                        <span className="text-[10px] text-gray-400">{formatMessageTime(msg.created_at)}</span>
+                        <span className="text-[10px] text-ink-tertiary">{formatMessageTime(msg.created_at)}</span>
                         {msg.role === "assistant" && <CheckCheck className="h-3 w-3 text-blue-500" />}
                       </div>
                     </div>
@@ -684,9 +684,9 @@ export default function WhatsAppPage() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-100 bg-white px-3 py-2">
+          <div className="border-t border-hairline bg-canvas px-3 py-2">
             <div className="flex items-end gap-2">
-              <button className="shrink-0 rounded-full p-2 text-gray-400 hover:bg-gray-100 transition-colors">
+              <button className="shrink-0 rounded-full p-2 text-ink-tertiary hover:bg-parchment transition-colors">
                 <Smile className="h-5 w-5" />
               </button>
               <div className="flex-1">
@@ -697,7 +697,7 @@ export default function WhatsAppPage() {
                   onKeyDown={handleKeyDown}
                   placeholder="Digite uma mensagem..."
                   rows={1}
-                  className="w-full resize-none rounded-2xl bg-gray-50 border border-gray-100 px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300 transition-all"
+                  className="w-full resize-none rounded-2xl bg-parchment border border-hairline px-4 py-2.5 text-sm text-ink placeholder:text-ink-tertiary focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300 transition-all"
                 />
               </div>
               <button
@@ -705,7 +705,7 @@ export default function WhatsAppPage() {
                 disabled={!input.trim() || sending}
                 className={cn(
                   "shrink-0 flex h-10 w-10 items-center justify-center rounded-full transition-all",
-                  input.trim() ? "bg-emerald-500 text-white hover:bg-emerald-600 shadow-md shadow-emerald-200" : "bg-gray-100 text-gray-400"
+                  input.trim() ? "bg-emerald-500 text-white hover:bg-emerald-600 shadow-md shadow-emerald-200" : "bg-parchment text-ink-tertiary"
                 )}
               >
                 <Send className="h-4 w-4" />
@@ -714,13 +714,13 @@ export default function WhatsAppPage() {
           </div>
         </div>
       ) : (
-        <div className="hidden sm:flex flex-1 items-center justify-center bg-gray-50/50">
+        <div className="hidden sm:flex flex-1 items-center justify-center bg-parchment/50">
           <div className="text-center">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-100 to-emerald-50 mb-4">
               <MessageCircle className="h-10 w-10 text-emerald-400" />
             </div>
-            <h3 className="text-lg font-bold text-gray-700">WhatsApp ClinPRO</h3>
-            <p className="text-sm text-gray-400 mt-1 max-w-xs">
+            <h3 className="text-lg font-bold text-ink">WhatsApp ClinPRO</h3>
+            <p className="text-sm text-ink-tertiary mt-1 max-w-xs">
               Selecione uma conversa para visualizar e responder mensagens
             </p>
             <div className="mt-4 flex items-center justify-center gap-1.5">

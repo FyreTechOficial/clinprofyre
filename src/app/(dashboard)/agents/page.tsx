@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils/cn";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Bot,
   MessageSquare,
@@ -13,7 +12,6 @@ import {
   UserCheck,
   Activity,
   Settings,
-  ExternalLink,
   QrCode,
   Wifi,
   WifiOff,
@@ -24,6 +22,9 @@ import {
   Smartphone,
   X,
   Loader2,
+  TrendingUp,
+  BarChart3,
+  Shield,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -43,50 +44,55 @@ interface AgentFlow {
   config?: any;
 }
 
-const AGENT_CONFIG: Record<string, { name: string; description: string; icon: any; color: string; trigger: string }> = {
+const AGENT_CONFIG: Record<string, { name: string; description: string; icon: any; color: string; colorBg: string; trigger: string }> = {
   atendimento: {
-    name: "Agente de Atendimento 24/7",
-    description: "Responde mensagens de texto e áudio no WhatsApp automaticamente com IA",
+    name: "Atendimento 24/7",
+    description: "Responde mensagens de texto e áudio no WhatsApp automaticamente",
     icon: MessageSquare,
     color: "from-brand-500 to-brand-700",
+    colorBg: "bg-brand-50 text-brand-700",
     trigger: "Webhook (tempo real)",
   },
   qualificacao: {
-    name: "Agente de Qualificação",
-    description: "Classifica leads em quente/morno/frio, preenche cadastro e identifica interesse",
+    name: "Qualificação",
+    description: "Classifica leads, preenche cadastro e identifica interesse",
     icon: Star,
-    color: "from-amber-500 to-amber-700",
+    color: "from-amber-500 to-amber-600",
+    colorBg: "bg-amber-50 text-amber-700",
     trigger: "Integrado ao Atendimento",
   },
   agendamento: {
-    name: "Agente de Confirmação",
-    description: "Confirma agendamentos 48h/24h antes, reagenda e lembra o paciente",
+    name: "Confirmação",
+    description: "Confirma agendamentos 48h/24h antes e reagenda automaticamente",
     icon: CalendarCheck,
-    color: "from-blue-500 to-blue-700",
+    color: "from-blue-500 to-blue-600",
+    colorBg: "bg-blue-50 text-blue-700",
     trigger: "Cron a cada 1h",
   },
   followup: {
-    name: "Agente de Follow-up",
-    description: "Envia follow-up D1/D3/D7, recupera no-show e reativa pacientes inativos (+90 dias)",
+    name: "Follow-up",
+    description: "Envia follow-up D1/D3/D7, recupera no-show e reativa inativos",
     icon: Zap,
-    color: "from-emerald-500 to-emerald-700",
+    color: "from-emerald-500 to-emerald-600",
+    colorBg: "bg-emerald-50 text-emerald-700",
     trigger: "Cron a cada 2h",
   },
   pos_atendimento: {
-    name: "Agente de Pós-Atendimento",
-    description: "Envia pesquisa NPS, solicita review no Google e incentiva indicação",
+    name: "Pós-Atendimento",
+    description: "Pesquisa NPS, review no Google e incentiva indicação",
     icon: UserCheck,
-    color: "from-rose-500 to-rose-700",
+    color: "from-rose-500 to-rose-600",
+    colorBg: "bg-rose-50 text-rose-700",
     trigger: "Cron diário 9h",
   },
 };
 
 const WORKFLOWS = [
-  { name: "Agente de Atendimento + Qualificação", status: "active", endpoint: "Webhook /clinpro-webhook" },
-  { name: "Agente de Confirmação de Agendamentos", status: "active", endpoint: "Cron 1h" },
-  { name: "Agente de Follow-up + Reativação", status: "active", endpoint: "Cron 2h" },
-  { name: "Agente de Pós-Atendimento (NPS)", status: "inactive", endpoint: "Cron diário 9h" },
-  { name: "Agente de Relatórios + Inteligência", status: "active", endpoint: "Cron diário 7h" },
+  { name: "Atendimento + Qualificação", status: "active", endpoint: "Webhook /clinpro-webhook" },
+  { name: "Confirmação de Agendamentos", status: "active", endpoint: "Cron 1h" },
+  { name: "Follow-up + Reativação", status: "active", endpoint: "Cron 2h" },
+  { name: "Pós-Atendimento (NPS)", status: "inactive", endpoint: "Cron diário 9h" },
+  { name: "Relatórios + Inteligência", status: "active", endpoint: "Cron diário 7h" },
 ];
 
 export default function AgentsPage() {
@@ -99,40 +105,31 @@ export default function AgentsPage() {
   const [editingAgent, setEditingAgent] = useState<AgentFlow | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [resetting, setResetting] = useState<string | null>(null);
-  const [dateFrom, setDateFrom] = useState(() => new Date().toISOString().split("T")[0]);
-  const [dateTo, setDateTo] = useState(() => new Date().toISOString().split("T")[0]);
 
   const { tenantId } = useAuth();
 
-  // Fetch agents from Supabase
   useEffect(() => {
     async function fetchAgents() {
       try {
         const res = await fetch(`/api/agents?tenant_id=${tenantId}`);
         const data = await res.json();
         if (data.agents?.length > 0) setAgents(data.agents);
-      } catch {} finally {
-        setLoading(false);
-      }
+      } catch {} finally { setLoading(false); }
     }
     fetchAgents();
   }, [tenantId]);
 
-  // Check Evolution connection
   useEffect(() => {
     async function checkConnection() {
       try {
         const res = await fetch("/api/whatsapp/status");
         const data = await res.json();
         setConnectionStatus(data.connected ? "connected" : "disconnected");
-      } catch {
-        setConnectionStatus("disconnected");
-      }
+      } catch { setConnectionStatus("disconnected"); }
     }
     checkConnection();
   }, []);
 
-  // Save agent edit
   async function saveAgentEdit() {
     if (!editingAgent) return;
     setSavingEdit(true);
@@ -141,24 +138,16 @@ export default function AgentsPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tenant_id: tenantId,
-          agent_type: editingAgent.agent_type,
-          typing_delay_min: editingAgent.typing_delay_min,
-          typing_delay_max: editingAgent.typing_delay_max,
-          delay_between_msgs: editingAgent.delay_between_msgs,
-          max_msgs_per_response: editingAgent.max_msgs_per_response,
+          tenant_id: tenantId, agent_type: editingAgent.agent_type,
+          typing_delay_min: editingAgent.typing_delay_min, typing_delay_max: editingAgent.typing_delay_max,
+          delay_between_msgs: editingAgent.delay_between_msgs, max_msgs_per_response: editingAgent.max_msgs_per_response,
         }),
       });
-      setAgents((prev) =>
-        prev.map((a) => a.agent_type === editingAgent.agent_type ? { ...a, ...editingAgent } : a)
-      );
+      setAgents((prev) => prev.map((a) => a.agent_type === editingAgent.agent_type ? { ...a, ...editingAgent } : a));
       setEditingAgent(null);
-    } catch {} finally {
-      setSavingEdit(false);
-    }
+    } catch {} finally { setSavingEdit(false); }
   }
 
-  // Reset agent counters
   async function resetAgent(agentType: string) {
     if (!confirm("Tem certeza que deseja zerar os contadores deste agente?")) return;
     setResetting(agentType);
@@ -168,15 +157,10 @@ export default function AgentsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tenant_id: tenantId, agent_type: agentType, messages_today: 0, executions_total: 0 }),
       });
-      setAgents((prev) =>
-        prev.map((a) => a.agent_type === agentType ? { ...a, messages_today: 0, executions_total: 0 } : a)
-      );
-    } catch {} finally {
-      setResetting(null);
-    }
+      setAgents((prev) => prev.map((a) => a.agent_type === agentType ? { ...a, messages_today: 0, executions_total: 0 } : a));
+    } catch {} finally { setResetting(null); }
   }
 
-  // Toggle agent on/off
   async function toggleAgent(agentType: string, currentEnabled: boolean) {
     setToggling(agentType);
     try {
@@ -185,15 +169,10 @@ export default function AgentsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tenant_id: tenantId, agent_type: agentType, enabled: !currentEnabled }),
       });
-      setAgents((prev) =>
-        prev.map((a) => a.agent_type === agentType ? { ...a, enabled: !currentEnabled } : a)
-      );
-    } catch {} finally {
-      setToggling(null);
-    }
+      setAgents((prev) => prev.map((a) => a.agent_type === agentType ? { ...a, enabled: !currentEnabled } : a));
+    } catch {} finally { setToggling(null); }
   }
 
-  // Generate QR
   async function generateQr() {
     setShowQrModal(true);
     setQrBase64(null);
@@ -208,127 +187,105 @@ export default function AgentsPage() {
   const totalMessages = agents.reduce((acc, a) => acc + a.messages_today, 0);
   const totalExecutions = agents.reduce((acc, a) => acc + a.executions_total, 0);
 
-  // Use mock data if no agents from Supabase
   const agentList = agents.length > 0 ? agents : Object.keys(AGENT_CONFIG).map((type) => ({
-    id: type,
-    tenant_id: tenantId,
-    agent_type: type,
-    enabled: type !== "pos_atendimento",
-    last_execution: null,
-    executions_total: 0,
-    messages_today: 0,
-    success_rate: 100,
+    id: type, tenant_id: tenantId, agent_type: type,
+    enabled: type !== "pos_atendimento", last_execution: null,
+    executions_total: 0, messages_today: 0, success_rate: 100,
   }));
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Agentes IA</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Gerencie os agentes de automação da sua clínica
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 border border-brand-100">
-            <Bot className="h-4 w-4 text-brand-600" />
-            <span className="text-sm font-semibold text-brand-700">{activeCount} ativos</span>
-          </div>
+          <h1 className="text-[21px] font-semibold text-ink tracking-tight">Agentes IA</h1>
+          <p className="mt-0.5 text-[14px] text-ink-secondary">Gerencie os agentes de automação da sua clínica</p>
         </div>
       </div>
 
-      {/* Connection card */}
-      <div className={cn(
-        "rounded-2xl overflow-hidden shadow-sm",
-        connectionStatus === "connected"
-          ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
-          : "bg-gradient-to-r from-gray-600 to-gray-500"
-      )}>
-        <div className="px-5 py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-                <Smartphone className="h-7 w-7 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white">Conexão WhatsApp</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  {connectionStatus === "connected" ? (
-                    <><Wifi className="h-4 w-4 text-emerald-200" /><span className="text-sm text-emerald-100">Evolution API conectada</span></>
-                  ) : connectionStatus === "checking" ? (
-                    <><Loader2 className="h-4 w-4 text-white animate-spin" /><span className="text-sm text-white/80">Verificando...</span></>
-                  ) : (
-                    <><WifiOff className="h-4 w-4 text-red-200" /><span className="text-sm text-red-100">Desconectado</span></>
-                  )}
-                </div>
+      {/* Stats + Connection */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+        {/* Connection */}
+        <div className={cn(
+          "lg:col-span-1 rounded-[18px] p-5 flex flex-col justify-between",
+          connectionStatus === "connected"
+            ? "bg-gradient-to-br from-emerald-500 to-emerald-600"
+            : "bg-gradient-to-br from-ink-secondary to-ink"
+        )}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-white/20">
+              <Smartphone className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-white">WhatsApp</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {connectionStatus === "connected" ? (
+                  <><Wifi className="h-3 w-3 text-emerald-200" /><span className="text-[11px] text-white/80">Conectado</span></>
+                ) : connectionStatus === "checking" ? (
+                  <><Loader2 className="h-3 w-3 text-white animate-spin" /><span className="text-[11px] text-white/80">Verificando...</span></>
+                ) : (
+                  <><WifiOff className="h-3 w-3 text-red-200" /><span className="text-[11px] text-white/80">Desconectado</span></>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              {connectionStatus === "disconnected" && (
-                <button onClick={generateQr} className="inline-flex items-center gap-2 rounded-xl bg-white/20 hover:bg-white/30 px-4 py-2.5 text-sm font-medium text-white transition-all">
-                  <QrCode className="h-4 w-4" /> Conectar QR Code
-                </button>
-              )}
-              <button
-                onClick={async () => {
-                  setConnectionStatus("checking");
-                  const res = await fetch("/api/whatsapp/status");
-                  const data = await res.json();
-                  setConnectionStatus(data.connected ? "connected" : "disconnected");
-                }}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-all"
-              >
-                <RefreshCw className="h-4 w-4" /> Verificar
+          </div>
+          <div className="flex gap-2">
+            {connectionStatus === "disconnected" && (
+              <button onClick={generateQr} className="flex-1 rounded-full bg-white/20 hover:bg-white/30 px-3 py-2 text-[12px] font-medium text-white transition-all active:scale-[0.97]">
+                <QrCode className="h-3.5 w-3.5 inline mr-1" /> QR Code
               </button>
-            </div>
+            )}
+            <button
+              onClick={async () => {
+                setConnectionStatus("checking");
+                const res = await fetch("/api/whatsapp/status");
+                const data = await res.json();
+                setConnectionStatus(data.connected ? "connected" : "disconnected");
+              }}
+              className="flex-1 rounded-full bg-white px-3 py-2 text-[12px] font-semibold text-ink transition-all active:scale-[0.97]"
+            >
+              <RefreshCw className="h-3.5 w-3.5 inline mr-1" /> Verificar
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Date range filter */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-          <Calendar className="h-4 w-4 text-gray-400" />
-          Periodo:
+        {/* Stat cards */}
+        <div className="rounded-[18px] bg-canvas border border-divider p-5 flex items-center gap-4">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-brand-50 text-brand-700">
+            <Bot className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">Ativos</p>
+            <p className="text-[24px] font-bold text-ink leading-none mt-1">{activeCount}<span className="text-[14px] font-normal text-ink-tertiary">/{agentList.length}</span></p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
-          />
-          <span className="text-xs text-gray-400">ate</span>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
-          />
-        </div>
-      </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border border-gray-100 bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-bold text-gray-900">{totalMessages || "—"}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Mensagens hoje</p>
+        <div className="rounded-[18px] bg-canvas border border-divider p-5 flex items-center gap-4">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-blue-50 text-blue-600">
+            <MessageSquare className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">Mensagens Hoje</p>
+            <p className="text-[24px] font-bold text-ink leading-none mt-1">{totalMessages || "—"}</p>
+          </div>
         </div>
-        <div className="rounded-xl border border-gray-100 bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-bold text-gray-900">{totalExecutions || "—"}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Execuções total</p>
-        </div>
-        <div className="rounded-xl border border-gray-100 bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-bold text-emerald-600">{activeCount}/{agentList.length}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Agentes ativos</p>
+
+        <div className="rounded-[18px] bg-canvas border border-divider p-5 flex items-center gap-4">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-emerald-50 text-emerald-600">
+            <TrendingUp className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-[11px] font-medium text-ink-tertiary uppercase tracking-wider">Execuções Total</p>
+            <p className="text-[24px] font-bold text-ink leading-none mt-1">{totalExecutions || "—"}</p>
+          </div>
         </div>
       </div>
 
       {/* Agent cards */}
       {loading ? (
-        <div className="text-center py-12"><Loader2 className="h-6 w-6 animate-spin mx-auto text-gray-400" /></div>
+        <div className="text-center py-12"><Loader2 className="h-6 w-6 animate-spin mx-auto text-brand-700" /></div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {agentList.map((agent, i) => {
             const config = AGENT_CONFIG[agent.agent_type];
             if (!config) return null;
@@ -340,76 +297,29 @@ export default function AgentsPage() {
               <div
                 key={agent.agent_type}
                 className={cn(
-                  "animate-slide-up rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md overflow-hidden",
-                  isActive ? "border-gray-100" : "border-gray-100 opacity-60"
+                  "animate-slide-up rounded-[18px] border bg-canvas transition-all overflow-hidden group",
+                  isActive ? "border-divider hover:border-hairline" : "border-divider opacity-50"
                 )}
-                style={{ animationDelay: `${i * 80}ms`, animationFillMode: "both" }}
+                style={{ animationDelay: `${i * 60}ms`, animationFillMode: "both" }}
               >
-                {/* Color bar */}
-                <div className={cn("h-1.5 bg-gradient-to-r", config.color)} />
-
                 <div className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg text-white", config.color)}>
-                        <Icon className="h-6 w-6" />
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-gradient-to-br text-white", config.color)}>
+                        <Icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-gray-900">{config.name}</h3>
-                        <p className="mt-0.5 text-xs text-gray-500">{config.description}</p>
+                        <h3 className="text-[15px] font-semibold text-ink">{config.name}</h3>
+                        <p className="text-[12px] text-ink-tertiary mt-0.5">{config.trigger}</p>
                       </div>
-                    </div>
-                    <div className={cn(
-                      "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1",
-                      isActive ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-gray-50 text-gray-500 ring-gray-200"
-                    )}>
-                      <span className={cn("h-2 w-2 rounded-full", isActive ? "bg-emerald-500 animate-pulse" : "bg-gray-400")} />
-                      {isActive ? "Ativo" : "Inativo"}
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="mt-4 grid grid-cols-3 gap-3">
-                    <div className="rounded-xl bg-gray-50/80 px-3 py-2.5 text-center">
-                      <p className="text-lg font-bold text-gray-900">{agent.messages_today}</p>
-                      <p className="text-[10px] text-gray-500 font-medium">Hoje</p>
-                    </div>
-                    <div className="rounded-xl bg-gray-50/80 px-3 py-2.5 text-center">
-                      <p className="text-lg font-bold text-gray-900">{agent.executions_total.toLocaleString()}</p>
-                      <p className="text-[10px] text-gray-500 font-medium">Total</p>
-                    </div>
-                    <div className="rounded-xl bg-gray-50/80 px-3 py-2.5 text-center">
-                      <p className="text-lg font-bold text-emerald-600">{agent.success_rate}%</p>
-                      <p className="text-[10px] text-gray-500 font-medium">Sucesso</p>
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setEditingAgent({ ...agent })}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-400 hover:bg-brand-50 hover:text-brand-600 transition-colors"
-                      >
-                        <Settings className="h-3 w-3" />
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => resetAgent(agent.agent_type)}
-                        disabled={resetting === agent.agent_type}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
-                      >
-                        <RefreshCw className={cn("h-3 w-3", resetting === agent.agent_type && "animate-spin")} />
-                        Zerar
-                      </button>
-                      <span className="text-[10px] text-gray-300">{config.trigger}</span>
                     </div>
                     <button
                       onClick={() => toggleAgent(agent.agent_type, agent.enabled)}
                       disabled={isToggling}
                       className={cn(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                        isActive ? "bg-brand-600" : "bg-gray-300",
+                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0",
+                        isActive ? "bg-brand-600" : "bg-hairline",
                         isToggling && "opacity-50"
                       )}
                     >
@@ -419,6 +329,52 @@ export default function AgentsPage() {
                       )} />
                     </button>
                   </div>
+
+                  {/* Description */}
+                  <p className="text-[13px] text-ink-secondary leading-relaxed mb-4">{config.description}</p>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="rounded-[10px] bg-parchment px-3 py-2 text-center">
+                      <p className="text-[18px] font-bold text-ink leading-none">{agent.messages_today}</p>
+                      <p className="text-[10px] text-ink-tertiary font-medium mt-1">Hoje</p>
+                    </div>
+                    <div className="rounded-[10px] bg-parchment px-3 py-2 text-center">
+                      <p className="text-[18px] font-bold text-ink leading-none">{agent.executions_total.toLocaleString()}</p>
+                      <p className="text-[10px] text-ink-tertiary font-medium mt-1">Total</p>
+                    </div>
+                    <div className="rounded-[10px] bg-parchment px-3 py-2 text-center">
+                      <p className="text-[18px] font-bold text-emerald-600 leading-none">{agent.success_rate}%</p>
+                      <p className="text-[10px] text-ink-tertiary font-medium mt-1">Sucesso</p>
+                    </div>
+                  </div>
+
+                  {/* Status + Actions */}
+                  <div className="flex items-center justify-between border-t border-divider pt-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn("h-2 w-2 rounded-full", isActive ? "bg-emerald-500 animate-pulse" : "bg-hairline")} />
+                      <span className={cn("text-[12px] font-medium", isActive ? "text-emerald-600" : "text-ink-tertiary")}>
+                        {isActive ? "Online" : "Offline"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setEditingAgent({ ...agent })}
+                        className="rounded-full p-1.5 text-ink-tertiary hover:bg-parchment hover:text-ink transition-colors"
+                        title="Configurar"
+                      >
+                        <Settings className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => resetAgent(agent.agent_type)}
+                        disabled={resetting === agent.agent_type}
+                        className="rounded-full p-1.5 text-ink-tertiary hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50"
+                        title="Zerar contadores"
+                      >
+                        <RefreshCw className={cn("h-3.5 w-3.5", resetting === agent.agent_type && "animate-spin")} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -427,109 +383,72 @@ export default function AgentsPage() {
       )}
 
       {/* Workflows */}
-      <Card className="!shadow-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-brand-600" />
-              Workflows n8n
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
+      <div className="rounded-[18px] border border-divider bg-canvas overflow-hidden">
+        <div className="px-6 py-4 border-b border-divider flex items-center gap-2">
+          <Activity className="h-5 w-5 text-brand-700" />
+          <h3 className="text-[15px] font-semibold text-ink">Workflows n8n</h3>
+        </div>
+        <div className="divide-y divide-divider">
           {WORKFLOWS.map((wf) => (
-            <div key={wf.name} className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 transition-all hover:bg-gray-50/80">
+            <div key={wf.name} className="flex items-center justify-between px-6 py-3.5 hover:bg-parchment/50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", wf.status === "active" ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-400")}>
-                  {wf.status === "active" ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                </div>
+                {wf.status === "active" ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-ink-tertiary shrink-0" />
+                )}
                 <div>
-                  <p className="text-sm font-medium text-gray-800">{wf.name}</p>
-                  <p className="text-xs text-gray-400">{wf.endpoint}</p>
+                  <p className="text-[13px] font-medium text-ink">{wf.name}</p>
+                  <p className="text-[11px] text-ink-tertiary">{wf.endpoint}</p>
                 </div>
               </div>
-              <ChevronRight className="h-4 w-4 text-gray-300" />
+              <ChevronRight className="h-4 w-4 text-ink-tertiary" />
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Edit Agent Modal */}
       {editingAgent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="animate-slide-up w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl mx-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+          <div className="animate-slide-up w-full max-w-md rounded-[22px] bg-canvas border border-divider p-6 shadow-xl mx-4">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-[17px] font-semibold text-ink tracking-tight">
                   {AGENT_CONFIG[editingAgent.agent_type]?.name || editingAgent.agent_type}
                 </h2>
-                <p className="text-xs text-gray-500">Configurações de comportamento</p>
+                <p className="text-[12px] text-ink-secondary mt-0.5">Configurações de comportamento</p>
               </div>
-              <button onClick={() => setEditingAgent(null)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100">
-                <XCircle className="h-5 w-5" />
+              <button onClick={() => setEditingAgent(null)} className="rounded-full p-1.5 text-ink-tertiary hover:bg-parchment">
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Delay mínimo de digitação (ms)</label>
-                <input
-                  type="number"
-                  value={editingAgent.typing_delay_min ?? 1000}
-                  onChange={(e) => setEditingAgent({ ...editingAgent, typing_delay_min: parseInt(e.target.value) || 1000 })}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
-                />
-                <p className="text-[10px] text-gray-400 mt-1">Tempo mínimo que simula digitação (1000 = 1 segundo)</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Delay máximo de digitação (ms)</label>
-                <input
-                  type="number"
-                  value={editingAgent.typing_delay_max ?? 4000}
-                  onChange={(e) => setEditingAgent({ ...editingAgent, typing_delay_max: parseInt(e.target.value) || 4000 })}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
-                />
-                <p className="text-[10px] text-gray-400 mt-1">Tempo máximo. O delay real é proporcional ao tamanho da mensagem</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Delay entre mensagens (ms)</label>
-                <input
-                  type="number"
-                  value={editingAgent.delay_between_msgs ?? 800}
-                  onChange={(e) => setEditingAgent({ ...editingAgent, delay_between_msgs: parseInt(e.target.value) || 800 })}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
-                />
-                <p className="text-[10px] text-gray-400 mt-1">Pausa entre cada mensagem enviada</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Máximo de mensagens por resposta</label>
-                <input
-                  type="number"
-                  value={editingAgent.max_msgs_per_response ?? 3}
-                  onChange={(e) => setEditingAgent({ ...editingAgent, max_msgs_per_response: parseInt(e.target.value) || 3 })}
-                  min={1}
-                  max={5}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
-                />
-                <p className="text-[10px] text-gray-400 mt-1">Quantas mensagens separadas o agente pode enviar de uma vez</p>
-              </div>
+            <div className="space-y-4">
+              {[
+                { label: "Delay mínimo de digitação (ms)", key: "typing_delay_min", default: 1000, hint: "Tempo mínimo que simula digitação" },
+                { label: "Delay máximo de digitação (ms)", key: "typing_delay_max", default: 4000, hint: "Delay proporcional ao tamanho da mensagem" },
+                { label: "Delay entre mensagens (ms)", key: "delay_between_msgs", default: 800, hint: "Pausa entre cada mensagem enviada" },
+                { label: "Máx. mensagens por resposta", key: "max_msgs_per_response", default: 3, hint: "Quantas mensagens separadas por vez" },
+              ].map((field) => (
+                <div key={field.key}>
+                  <label className="block text-[13px] font-semibold text-ink mb-1">{field.label}</label>
+                  <input
+                    type="number"
+                    value={(editingAgent as any)[field.key] ?? field.default}
+                    onChange={(e) => setEditingAgent({ ...editingAgent, [field.key]: parseInt(e.target.value) || field.default })}
+                    className="w-full rounded-[12px] border border-hairline bg-canvas px-4 py-2.5 text-[14px] text-ink focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                  <p className="text-[11px] text-ink-tertiary mt-1">{field.hint}</p>
+                </div>
+              ))}
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setEditingAgent(null)}
-                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
+              <button onClick={() => setEditingAgent(null)} className="flex-1 rounded-full border border-divider bg-canvas px-4 py-2.5 text-[14px] font-medium text-ink hover:bg-parchment active:scale-[0.97] transition-all">
                 Cancelar
               </button>
-              <button
-                onClick={saveAgentEdit}
-                disabled={savingEdit}
-                className="flex-1 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow-md hover:bg-brand-700 disabled:opacity-50"
-              >
+              <button onClick={saveAgentEdit} disabled={savingEdit} className="flex-1 rounded-full brand-gradient px-4 py-2.5 text-[14px] font-medium text-white hover:brightness-110 disabled:opacity-50 active:scale-[0.97] transition-all">
                 {savingEdit ? "Salvando..." : "Salvar"}
               </button>
             </div>
@@ -539,24 +458,24 @@ export default function AgentsPage() {
 
       {/* QR Modal */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="animate-slide-up w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl mx-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm animate-fade-in">
+          <div className="animate-slide-up w-full max-w-sm rounded-[22px] bg-canvas border border-divider p-6 shadow-xl mx-4">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Conectar WhatsApp</h2>
-              <button onClick={() => setShowQrModal(false)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"><X className="h-5 w-5" /></button>
+              <h2 className="text-[17px] font-semibold text-ink tracking-tight">Conectar WhatsApp</h2>
+              <button onClick={() => setShowQrModal(false)} className="rounded-full p-1.5 text-ink-tertiary hover:bg-parchment"><X className="h-5 w-5" /></button>
             </div>
             <div className="flex flex-col items-center gap-4">
               {qrBase64 ? (
-                <div className="w-56 h-56 rounded-2xl overflow-hidden border-2 border-gray-100 bg-white p-2">
+                <div className="w-56 h-56 rounded-[18px] overflow-hidden border border-divider bg-canvas p-2">
                   <img src={qrBase64} alt="QR Code" className="w-full h-full object-contain" />
                 </div>
               ) : (
-                <div className="w-56 h-56 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center">
-                  <Loader2 className="h-8 w-8 text-gray-300 animate-spin" />
+                <div className="w-56 h-56 rounded-[18px] border-2 border-dashed border-divider flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 text-ink-tertiary animate-spin" />
                 </div>
               )}
-              <p className="text-xs text-gray-500 text-center">Escaneie com WhatsApp &gt; Aparelhos conectados</p>
-              <button onClick={generateQr} className="w-full rounded-xl bg-brand-600 py-2.5 text-sm font-medium text-white shadow-md hover:bg-brand-700">
+              <p className="text-[12px] text-ink-secondary text-center">Escaneie com WhatsApp &gt; Aparelhos conectados</p>
+              <button onClick={generateQr} className="w-full rounded-full brand-gradient py-2.5 text-[14px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all">
                 Gerar Novo QR
               </button>
             </div>

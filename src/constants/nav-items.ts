@@ -1,4 +1,4 @@
-import { LayoutDashboard, KanbanSquare, Users, Calendar, BarChart3, Sparkles, Settings, MessageCircle, Bot, Shield, HelpCircle } from "lucide-react";
+import { LayoutDashboard, KanbanSquare, Users, Calendar, BarChart3, Sparkles, Settings, MessageCircle, Bot, Shield, HelpCircle, Megaphone, TrendingUp, Puzzle } from "lucide-react";
 
 // Items visible to clinic users (tenants)
 export const navItems = [
@@ -8,9 +8,11 @@ export const navItems = [
   { label: "WhatsApp", href: "/whatsapp", icon: MessageCircle },
   { label: "Agenda", href: "/appointments", icon: Calendar },
   { label: "Agentes", href: "/agents", icon: Bot },
+  { label: "Campanhas", href: "/campanhas", icon: Megaphone },
+  { label: "Tráfego", href: "/trafego", icon: TrendingUp },
   { label: "Relatórios", href: "/reports", icon: BarChart3 },
+  { label: "Integrações", href: "/integracoes", icon: Puzzle },
   { label: "Clin.IA", href: "/clin-ia", icon: Sparkles },
-  { label: "Suporte", href: "/suporte", icon: HelpCircle },
   { label: "Configurações", href: "/settings/clinic", icon: Settings },
 ];
 

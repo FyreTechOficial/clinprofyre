@@ -2,7 +2,6 @@ import React, { type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils/cn";
 
 interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
-  /** Render a circle (for avatar placeholders) */
   circle?: boolean;
 }
 
@@ -11,7 +10,7 @@ function Skeleton({ className, circle = false, ...props }: SkeletonProps) {
     <div
       aria-hidden
       className={cn(
-        "animate-pulse bg-gray-200/70 rounded-xl",
+        "animate-pulse bg-divider/60 rounded-[12px]",
         circle && "rounded-full",
         className,
       )}
@@ -19,8 +18,6 @@ function Skeleton({ className, circle = false, ...props }: SkeletonProps) {
     />
   );
 }
-
-/* Convenience presets */
 
 function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
@@ -39,7 +36,7 @@ function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-gray-100 bg-white p-6 space-y-4",
+        "rounded-[18px] border border-divider bg-canvas p-6 space-y-4",
         className,
       )}
     >

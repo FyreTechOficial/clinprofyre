@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils/cn";
-import { Building2, Upload, Loader2, Bell, MessageSquare, Check, RefreshCw, ImageIcon, X } from "lucide-react";
+import { Building2, Loader2, Bell, MessageSquare, Check, RefreshCw, MapPin, Phone, Clock } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
 
 interface WhatsAppGroup {
   id: string;
@@ -20,10 +21,7 @@ export default function ClinicSettingsPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
 
-  // Alert group
   const [groups, setGroups] = useState<WhatsAppGroup[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState("");
   const [selectedGroupName, setSelectedGroupName] = useState("");
@@ -31,7 +29,6 @@ export default function ClinicSettingsPage() {
   const [savingGroup, setSavingGroup] = useState(false);
   const [groupSaved, setGroupSaved] = useState(false);
 
-  // Load tenant data
   useEffect(() => {
     if (!tenant) return;
     setForm({
@@ -42,49 +39,8 @@ export default function ClinicSettingsPage() {
     });
     setSelectedGroupId((tenant as any).alert_group_id || "");
     setSelectedGroupName((tenant as any).alert_group_name || "");
-    setLogoUrl((tenant as any).logo_url || null);
   }, [tenant]);
 
-  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !tenantId) return;
-    setUploadingLogo(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("tenant_id", tenantId);
-      const res = await fetch("/api/upload-logo", { method: "POST", body: formData });
-      const data = await res.json();
-      if (data.logo_url) {
-        setLogoUrl(data.logo_url);
-        await refreshTenant();
-      }
-    } catch {} finally {
-      setUploadingLogo(false);
-    }
-  }
-
-  async function handleRemoveLogo() {
-    if (!tenantId) return;
-    setUploadingLogo(true);
-    try {
-      // Just clear the logo_url in the tenant
-      const supabaseUrl = "https://bkihuixqdpfinqeuqrgc.supabase.co";
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-      // Use the API instead
-      await fetch("/api/whatsapp/groups", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenant_id: tenantId, alert_group_id: selectedGroupId, alert_group_name: selectedGroupName }),
-      });
-      setLogoUrl(null);
-      await refreshTenant();
-    } catch {} finally {
-      setUploadingLogo(false);
-    }
-  }
-
-  // Load groups
   async function loadGroups() {
     if (!tenant?.evolution_instance) return;
     setLoadingGroups(true);
@@ -92,9 +48,7 @@ export default function ClinicSettingsPage() {
       const res = await fetch(`/api/whatsapp/groups?instance=${tenant.evolution_instance}`);
       const data = await res.json();
       setGroups(data.groups ?? []);
-    } catch {} finally {
-      setLoadingGroups(false);
-    }
+    } catch {} finally { setLoadingGroups(false); }
   }
 
   useEffect(() => {
@@ -107,13 +61,25 @@ export default function ClinicSettingsPage() {
     setIsSaving(true);
     setSaved(false);
     try {
-      // TODO: Save to Supabase when API is ready
-      await new Promise((r) => setTimeout(r, 500));
+      const res = await fetch("/api/settings/clinic", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_id: tenantId,
+          name: form.name,
+          address: form.address,
+          phone: form.phone,
+          working_hours: form.workingHours,
+        }),
+      });
+      if (!res.ok) throw new Error("Erro ao salvar");
+      await refreshTenant();
       setSaved(true);
+      toast.success("Dados da clínica salvos!");
       setTimeout(() => setSaved(false), 3000);
-    } catch {} finally {
-      setIsSaving(false);
-    }
+    } catch {
+      toast.error("Erro ao salvar dados");
+    } finally { setIsSaving(false); }
   }
 
   async function handleSaveGroup() {
@@ -124,125 +90,123 @@ export default function ClinicSettingsPage() {
       await fetch("/api/whatsapp/groups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenant_id: tenantId,
-          alert_group_id: selectedGroupId,
-          alert_group_name: selectedGroupName,
-        }),
+        body: JSON.stringify({ tenant_id: tenantId, alert_group_id: selectedGroupId, alert_group_name: selectedGroupName }),
       });
       setGroupSaved(true);
       setTimeout(() => setGroupSaved(false), 3000);
-    } catch {} finally {
-      setSavingGroup(false);
-    }
+    } catch {} finally { setSavingGroup(false); }
   }
 
-  const INPUT_CLASS = cn(
-    "w-full px-4 py-3 rounded-xl",
-    "bg-white border border-gray-200",
-    "text-gray-800 placeholder-gray-400 text-sm",
-    "outline-none transition-all duration-200",
-    "focus:border-brand-300 focus:ring-2 focus:ring-brand-100"
-  );
-
   return (
-    <div className="animate-fade-in space-y-8">
-      {/* Clinic Info */}
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-brand-600" />
+    <div className="space-y-6 max-w-3xl">
+      {/* Clinic Info Card */}
+      <div className="rounded-[18px] border border-divider bg-canvas overflow-hidden">
+        <div className="px-6 py-4 border-b border-divider flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-brand-50 text-brand-700">
+            <Building2 className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Dados da Clínica</h2>
-            <p className="text-sm text-gray-500">Informações gerais</p>
+            <h2 className="text-[15px] font-semibold text-ink">Dados da Clínica</h2>
+            <p className="text-[12px] text-ink-tertiary">Informações gerais do estabelecimento</p>
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-5 max-w-2xl">
-          {/* Logo upload */}
+        <form onSubmit={handleSave} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Logo da Clínica</label>
-            <div className="flex items-center gap-4">
-              {logoUrl ? (
-                <div className="relative">
-                  <img src={logoUrl} alt="Logo" className="h-16 w-16 rounded-xl object-cover border border-gray-200 shadow-sm" />
-                  <button
-                    type="button"
-                    onClick={handleRemoveLogo}
-                    className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50">
-                  <ImageIcon className="h-6 w-6 text-gray-300" />
-                </div>
-              )}
-              <div>
-                <label className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors">
-                  {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                  {uploadingLogo ? "Enviando..." : "Enviar Logo"}
-                  <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" disabled={uploadingLogo} />
-                </label>
-                <p className="text-[10px] text-gray-400 mt-1">PNG, JPG ou SVG. Aparece na sidebar e no sistema.</p>
-              </div>
-            </div>
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-ink mb-1.5">
+              <Building2 className="h-3.5 w-3.5 text-ink-tertiary" />
+              Nome da Clínica
+            </label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Ex: Clínica Odonto Vida"
+              className="w-full px-4 py-2.5 rounded-[12px] bg-canvas border border-hairline text-[14px] text-ink placeholder:text-ink-tertiary outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all hover:border-ink-tertiary"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome da Clínica</label>
-            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Clínica Odonto Vida" className={INPUT_CLASS} />
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-ink mb-1.5">
+              <MapPin className="h-3.5 w-3.5 text-ink-tertiary" />
+              Endereço
+            </label>
+            <input
+              type="text"
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+              placeholder="Rua, número, bairro, cidade"
+              className="w-full px-4 py-2.5 rounded-[12px] bg-canvas border border-hairline text-[14px] text-ink placeholder:text-ink-tertiary outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all hover:border-ink-tertiary"
+            />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Endereço</label>
-            <input type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, número, bairro, cidade" className={INPUT_CLASS} />
-          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefone / WhatsApp</label>
-              <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(41) 99999-9999" className={INPUT_CLASS} />
+              <label className="flex items-center gap-1.5 text-[13px] font-semibold text-ink mb-1.5">
+                <Phone className="h-3.5 w-3.5 text-ink-tertiary" />
+                Telefone / WhatsApp
+              </label>
+              <input
+                type="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="(41) 99999-9999"
+                className="w-full px-4 py-2.5 rounded-[12px] bg-canvas border border-hairline text-[14px] text-ink placeholder:text-ink-tertiary outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all hover:border-ink-tertiary"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Horário de Funcionamento</label>
-              <input type="text" value={form.workingHours} onChange={(e) => setForm({ ...form, workingHours: e.target.value })} placeholder="Seg-Sex 8h-18h" className={INPUT_CLASS} />
+              <label className="flex items-center gap-1.5 text-[13px] font-semibold text-ink mb-1.5">
+                <Clock className="h-3.5 w-3.5 text-ink-tertiary" />
+                Horário de Funcionamento
+              </label>
+              <input
+                type="text"
+                value={form.workingHours}
+                onChange={(e) => setForm({ ...form, workingHours: e.target.value })}
+                placeholder="Seg-Sex 8h-18h"
+                className="w-full px-4 py-2.5 rounded-[12px] bg-canvas border border-hairline text-[14px] text-ink placeholder:text-ink-tertiary outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all hover:border-ink-tertiary"
+              />
             </div>
           </div>
-          <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-white text-sm bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-200 transition-all disabled:opacity-50">
-            {isSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : saved ? <><Check className="w-4 h-4" /> Salvo!</> : <><Upload className="w-4 h-4" /> Salvar</>}
-          </button>
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="inline-flex items-center gap-2 rounded-full brand-gradient px-6 py-2.5 text-[14px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-50"
+            >
+              {isSaving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : saved ? <><Check className="w-4 h-4" /> Salvo!</> : "Salvar alterações"}
+            </button>
+          </div>
         </form>
       </div>
 
-      {/* Alert Group */}
-      <div className="border-t border-gray-100 pt-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-amber-600" />
+      {/* Alert Group Card */}
+      <div className="rounded-[18px] border border-divider bg-canvas overflow-hidden">
+        <div className="px-6 py-4 border-b border-divider flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-amber-50 text-amber-600">
+            <Bell className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Grupo de Alertas</h2>
-            <p className="text-sm text-gray-500">Selecione o grupo do WhatsApp que receberá alertas de leads quentes</p>
+            <h2 className="text-[15px] font-semibold text-ink">Grupo de Alertas</h2>
+            <p className="text-[12px] text-ink-tertiary">Grupo do WhatsApp que receberá alertas de leads quentes</p>
           </div>
         </div>
 
-        <div className="max-w-2xl space-y-4">
-          {/* Current group */}
+        <div className="p-6 space-y-4">
           {selectedGroupName && (
-            <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3">
-              <MessageSquare className="h-5 w-5 text-emerald-600" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-emerald-800">Grupo ativo: {selectedGroupName}</p>
-                <p className="text-xs text-emerald-600 font-mono">{selectedGroupId}</p>
+            <div className="flex items-center gap-3 rounded-[12px] border border-emerald-200 bg-emerald-50/50 px-4 py-3">
+              <MessageSquare className="h-4 w-4 text-emerald-600 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-emerald-800">{selectedGroupName}</p>
+                <p className="text-[11px] text-emerald-600 font-mono truncate">{selectedGroupId}</p>
               </div>
             </div>
           )}
 
-          {/* Group selector */}
-          <div className="flex items-end gap-3">
+          <div className="flex items-end gap-2">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Selecionar Grupo</label>
+              <label className="text-[13px] font-semibold text-ink mb-1.5 block">Selecionar Grupo</label>
               <select
                 value={selectedGroupId}
                 onChange={(e) => {
@@ -250,7 +214,7 @@ export default function ClinicSettingsPage() {
                   setSelectedGroupId(e.target.value);
                   setSelectedGroupName(group?.name ?? "");
                 }}
-                className={INPUT_CLASS}
+                className="w-full px-4 py-2.5 rounded-[12px] bg-canvas border border-hairline text-[14px] text-ink outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all hover:border-ink-tertiary"
               >
                 <option value="">Nenhum (alertas só pro dono)</option>
                 {groups.map((g) => (
@@ -258,22 +222,28 @@ export default function ClinicSettingsPage() {
                 ))}
               </select>
             </div>
-            <button onClick={loadGroups} disabled={loadingGroups} className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-600 hover:bg-gray-50 transition-all">
+            <button
+              onClick={loadGroups}
+              disabled={loadingGroups}
+              className="shrink-0 flex items-center justify-center h-[42px] w-[42px] rounded-[12px] border border-hairline bg-canvas text-ink-secondary hover:bg-parchment transition-all active:scale-[0.97]"
+            >
               <RefreshCw className={cn("h-4 w-4", loadingGroups && "animate-spin")} />
             </button>
           </div>
 
           {groups.length === 0 && !loadingGroups && (
-            <p className="text-xs text-gray-400">Nenhum grupo encontrado. Verifique se o WhatsApp está conectado e se a clínica participa de algum grupo.</p>
+            <p className="text-[12px] text-ink-tertiary">Nenhum grupo encontrado. Verifique se o WhatsApp está conectado.</p>
           )}
 
-          <button
-            onClick={handleSaveGroup}
-            disabled={savingGroup}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-white text-sm bg-amber-600 hover:bg-amber-700 shadow-md shadow-amber-200 transition-all disabled:opacity-50"
-          >
-            {savingGroup ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : groupSaved ? <><Check className="w-4 h-4" /> Salvo!</> : <><Bell className="w-4 h-4" /> Salvar Grupo</>}
-          </button>
+          <div className="pt-1">
+            <button
+              onClick={handleSaveGroup}
+              disabled={savingGroup}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-2.5 text-[14px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-50"
+            >
+              {savingGroup ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : groupSaved ? <><Check className="w-4 h-4" /> Salvo!</> : <><Bell className="w-4 h-4" /> Salvar Grupo</>}
+            </button>
+          </div>
         </div>
       </div>
     </div>

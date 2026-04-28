@@ -5,19 +5,19 @@ import { cn } from "@/lib/utils/cn";
 
 const variantStyles = {
   default:
-    "bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-md shadow-brand-600/20",
+    "brand-gradient text-white hover:brightness-110 active:scale-[0.97]",
   secondary:
-    "bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200",
+    "bg-canvas text-brand-700 border border-brand-300 hover:bg-brand-50 active:scale-[0.97]",
   ghost:
-    "bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200",
+    "bg-transparent text-ink hover:bg-black/[0.04] active:scale-[0.97]",
   destructive:
-    "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-md shadow-red-600/20",
+    "bg-red-600 text-white hover:bg-red-700 active:scale-[0.97]",
 } as const;
 
 const sizeStyles = {
-  sm: "h-8 px-3 text-xs rounded-lg gap-1.5",
-  md: "h-10 px-4 text-sm rounded-xl gap-2",
-  lg: "h-12 px-6 text-base rounded-xl gap-2.5",
+  sm: "h-8 px-3.5 text-[13px] rounded-full gap-1.5",
+  md: "h-10 px-5 text-[15px] rounded-full gap-2",
+  lg: "h-12 px-7 text-[17px] rounded-full gap-2.5",
 } as const;
 
 type ButtonVariant = keyof typeof variantStyles;
@@ -77,7 +77,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "inline-flex items-center justify-center font-medium",
           "transition-all duration-200 ease-out",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
-          "disabled:opacity-50 disabled:pointer-events-none",
+          "disabled:opacity-40 disabled:pointer-events-none",
           variantStyles[variant],
           sizeStyles[size],
           className,

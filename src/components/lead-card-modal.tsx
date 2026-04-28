@@ -177,7 +177,7 @@ export default function LeadCardModal({
           <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
         </div>
       ) : !lead ? (
-        <div className="py-12 text-center text-gray-400 text-sm">
+        <div className="py-12 text-center text-ink-tertiary text-sm">
           Contato nao encontrado
         </div>
       ) : (
@@ -194,12 +194,12 @@ export default function LeadCardModal({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-ink">
                   {lead.name ?? lead.phone}
                 </h3>
                 <ScoreBadge score={lead.lead_score} />
               </div>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-gray-500">
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-ink-secondary">
                 <Phone className="h-3.5 w-3.5" />
                 {lead.phone.replace(
                   /(\d{2})(\d{2})(\d{5})(\d{4})/,
@@ -211,8 +211,8 @@ export default function LeadCardModal({
 
           {/* Details grid */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="rounded-xl bg-parchment p-3">
+              <p className="text-[10px] font-semibold text-ink-tertiary uppercase tracking-wider">
                 Pipeline
               </p>
               {stage ? (
@@ -223,31 +223,31 @@ export default function LeadCardModal({
                   {stage.label}
                 </span>
               ) : (
-                <p className="text-sm text-gray-600 mt-1">--</p>
+                <p className="text-sm text-ink-secondary mt-1">--</p>
               )}
             </div>
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="rounded-xl bg-parchment p-3">
+              <p className="text-[10px] font-semibold text-ink-tertiary uppercase tracking-wider">
                 Interesse
               </p>
-              <p className="text-sm font-medium text-gray-700 mt-1">
+              <p className="text-sm font-medium text-ink mt-1">
                 {lead.procedure_interest || "--"}
               </p>
             </div>
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="rounded-xl bg-parchment p-3">
+              <p className="text-[10px] font-semibold text-ink-tertiary uppercase tracking-wider">
                 Origem
               </p>
-              <p className="text-sm font-medium text-gray-700 mt-1">
+              <p className="text-sm font-medium text-ink mt-1">
                 {lead.source || "--"}
               </p>
             </div>
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="rounded-xl bg-parchment p-3">
+              <p className="text-[10px] font-semibold text-ink-tertiary uppercase tracking-wider">
                 Ultima interacao
               </p>
-              <p className="text-sm font-medium text-gray-700 mt-1 flex items-center gap-1">
-                <Clock className="h-3 w-3 text-gray-400" />
+              <p className="text-sm font-medium text-ink mt-1 flex items-center gap-1">
+                <Clock className="h-3 w-3 text-ink-tertiary" />
                 {lead.last_interaction
                   ? new Date(lead.last_interaction).toLocaleString("pt-BR", {
                       day: "2-digit",
@@ -262,7 +262,7 @@ export default function LeadCardModal({
 
           {/* Tags */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <p className="text-xs font-semibold text-ink-secondary uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Tag className="h-3.5 w-3.5" />
               Tags
             </p>
@@ -283,7 +283,7 @@ export default function LeadCardModal({
                 </span>
               ))}
               {tags.length === 0 && (
-                <span className="text-xs text-gray-400">Nenhuma tag</span>
+                <span className="text-xs text-ink-tertiary">Nenhuma tag</span>
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function LeadCardModal({
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
                 placeholder="Nova tag..."
-                className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
+                className="flex-1 rounded-lg border border-divider px-3 py-1.5 text-xs focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100"
               />
               <div className="flex items-center gap-1">
                 {TAG_COLORS.map((c) => (
@@ -303,7 +303,7 @@ export default function LeadCardModal({
                     className={cn(
                       "h-5 w-5 rounded-full transition-all",
                       newTagColor === c
-                        ? "ring-2 ring-offset-1 ring-gray-400 scale-110"
+                        ? "ring-2 ring-offset-1 ring-hairline scale-110"
                         : "hover:scale-110"
                     )}
                     style={{ backgroundColor: c }}
@@ -326,13 +326,13 @@ export default function LeadCardModal({
 
           {/* Messages */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <p className="text-xs font-semibold text-ink-secondary uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <MessageSquare className="h-3.5 w-3.5" />
               Ultimas mensagens
             </p>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {messages.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center py-4">
+                <p className="text-xs text-ink-tertiary text-center py-4">
                   Nenhuma mensagem encontrada
                 </p>
               ) : (
@@ -350,7 +350,7 @@ export default function LeadCardModal({
                         className={cn(
                           "max-w-[80%] rounded-xl px-3 py-2 text-xs",
                           isUser
-                            ? "bg-gray-100 text-gray-700"
+                            ? "bg-parchment text-ink"
                             : "bg-brand-600 text-white"
                         )}
                       >
@@ -370,7 +370,7 @@ export default function LeadCardModal({
                         <p
                           className={cn(
                             "text-[10px] mt-1",
-                            isUser ? "text-gray-400" : "text-white/60"
+                            isUser ? "text-ink-tertiary" : "text-white/60"
                           )}
                         >
                           {new Date(msg.created_at).toLocaleString("pt-BR", {

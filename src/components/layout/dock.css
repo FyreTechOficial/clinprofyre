@@ -1,0 +1,118 @@
+.dock-outer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 0.5rem;
+}
+
+.dock-panel {
+  display: flex;
+  align-items: flex-end;
+  width: fit-content;
+  gap: 0.25rem;
+  border-radius: 18px;
+  background: var(--glass-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid var(--glass-border);
+  padding: 0 0.4rem 0.4rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.dark .dock-panel {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dock-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--canvas);
+  border: 1px solid var(--divider);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.dock-item:hover {
+  border-color: var(--hairline);
+}
+
+.dock-item.dock-item--active {
+  background: linear-gradient(135deg, #3b0764 0%, #7c3aed 50%, #9333ea 100%);
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.dark .dock-item.dock-item--active {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dock-item:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+.dock-item:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.dock-item.dock-item--active .dock-icon {
+  color: #ffffff;
+}
+
+.dark .dock-item.dock-item--active .dock-icon {
+  color: #1d1d1f;
+}
+
+.dock-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+}
+
+.dock-item:hover .dock-icon {
+  color: var(--ink);
+}
+
+.dock-item.dock-item--active:hover .dock-icon {
+  color: #ffffff;
+}
+
+.dark .dock-item.dock-item--active:hover .dock-icon {
+  color: #1d1d1f;
+}
+
+.dock-label {
+  position: absolute;
+  top: -2rem;
+  left: 50%;
+  width: fit-content;
+  white-space: pre;
+  border-radius: 8px;
+  background: var(--canvas);
+  border: 1px solid var(--divider);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ink);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dock-separator {
+  width: 1px;
+  height: 28px;
+  background: var(--divider);
+  margin: 0 0.15rem;
+  align-self: center;
+  flex-shrink: 0;
+}

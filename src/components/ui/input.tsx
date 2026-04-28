@@ -19,7 +19,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-gray-700"
+            className="text-[13px] font-semibold text-ink tracking-tight"
           >
             {label}
           </label>
@@ -27,7 +27,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         <div className="relative">
           {icon && (
-            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+            <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-ink-tertiary">
               {icon}
             </span>
           )}
@@ -36,14 +36,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={cn(
-              "w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900",
-              "placeholder:text-gray-400",
+              "w-full rounded-[12px] border bg-canvas px-4 py-2.5 text-[15px] text-ink",
+              "placeholder:text-ink-tertiary",
               "transition-all duration-200 ease-out",
-              "focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500",
-              "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+              "focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500",
+              "disabled:cursor-not-allowed disabled:opacity-40 disabled:bg-parchment",
               error
-                ? "border-red-400 focus:ring-red-500/40 focus:border-red-500"
-                : "border-gray-200 hover:border-gray-300",
+                ? "border-red-400 focus:ring-red-500/30 focus:border-red-500"
+                : "border-hairline hover:border-ink-tertiary",
               icon && "pl-10",
               className,
             )}
@@ -56,12 +56,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && (
-          <p id={`${inputId}-error`} className="text-xs text-red-500">
+          <p id={`${inputId}-error`} className="text-[12px] text-red-500">
             {error}
           </p>
         )}
         {!error && hint && (
-          <p id={`${inputId}-hint`} className="text-xs text-gray-400">
+          <p id={`${inputId}-hint`} className="text-[12px] text-ink-tertiary">
             {hint}
           </p>
         )}

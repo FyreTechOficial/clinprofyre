@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 
 const sizeStyles = {
-  sm: "h-8 w-8 text-xs",
-  md: "h-10 w-10 text-sm",
-  lg: "h-14 w-14 text-base",
+  sm: "h-8 w-8 text-[11px]",
+  md: "h-10 w-10 text-[13px]",
+  lg: "h-14 w-14 text-[15px]",
 } as const;
 
 type AvatarSize = keyof typeof sizeStyles;
@@ -38,8 +38,8 @@ function Avatar({ src, alt, name, size = "md", className }: AvatarProps) {
     <span
       className={cn(
         "relative inline-flex shrink-0 items-center justify-center rounded-full",
-        "bg-brand-100 text-brand-700 font-semibold",
-        "ring-2 ring-white",
+        "brand-gradient text-white font-semibold",
+        "ring-2 ring-canvas",
         "overflow-hidden",
         sizeStyles[size],
         className,

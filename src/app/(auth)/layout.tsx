@@ -1,4 +1,8 @@
+"use client";
+
 import { cn } from "@/lib/utils/cn";
+import { Logo } from "@/components/ui/logo";
+import GradientBlinds from "@/components/ui/gradient-blinds";
 
 export default function AuthLayout({
   children,
@@ -9,34 +13,38 @@ export default function AuthLayout({
     <div
       className={cn(
         "min-h-screen flex flex-col items-center justify-center",
-        "bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900",
+        "bg-ink",
         "relative overflow-hidden"
       )}
     >
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-300/15 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl animate-pulse [animation-delay:2s]" />
-      </div>
+      {/* Animated gradient background */}
+      <GradientBlinds
+        gradientColors={["#3b0764", "#7c3aed", "#9333ea"]}
+        angle={45}
+        noise={0.15}
+        blindCount={10}
+        blindMinWidth={80}
+        spotlightRadius={0.6}
+        spotlightSoftness={1.2}
+        spotlightOpacity={0.8}
+        mouseDampening={0.2}
+        distortAmount={0}
+        shineDirection="left"
+        mixBlendMode="normal"
+      />
 
       {/* Logo */}
-      <div className="relative z-10 mb-8 text-center">
-        <h1 className="text-4xl font-bold text-white tracking-tight">
-          Clin<span className="text-purple-200">PRO</span>
-        </h1>
-        <p className="text-purple-200/70 text-sm mt-1 tracking-widest uppercase">
-          Gestão inteligente
-        </p>
+      <div className="relative z-10 mb-10 text-center">
+        <Logo size="lg" variant="light" className="inline-block" />
       </div>
 
-      {/* Glassmorphism card */}
+      {/* Card */}
       <div
         className={cn(
-          "relative z-10 w-full max-w-md mx-4",
-          "bg-white/10 backdrop-blur-xl",
-          "border border-white/20",
-          "rounded-2xl shadow-2xl shadow-purple-950/40",
+          "relative z-10 w-full max-w-[420px] mx-4",
+          "bg-white/[0.06] backdrop-blur-2xl",
+          "border border-white/[0.1]",
+          "rounded-[22px]",
           "p-8"
         )}
       >
@@ -44,7 +52,7 @@ export default function AuthLayout({
       </div>
 
       {/* Footer */}
-      <p className="relative z-10 mt-8 text-purple-200/50 text-xs">
+      <p className="relative z-10 mt-8 text-white/30 text-[12px]">
         &copy; {new Date().getFullYear()} ClinPRO. Todos os direitos reservados.
       </p>
     </div>

@@ -68,7 +68,7 @@ const PAYMENT_OPTIONS = [
   "Boleto", "Convênio", "Parcelamento",
 ];
 
-const INPUT_CLASS = "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100";
+const INPUT_CLASS = "w-full rounded-xl border border-divider px-4 py-2.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100";
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -213,15 +213,15 @@ export default function OnboardingPage() {
     <div className="animate-fade-in space-y-6 max-w-3xl mx-auto">
       {/* Header */}
       <div>
-        <Link href="/admin" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-3">
+        <Link href="/admin" className="inline-flex items-center gap-1 text-sm text-ink-secondary hover:text-ink mb-3">
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
         <div className="flex items-center gap-2 mb-1">
           <Shield className="h-5 w-5 text-brand-600" />
           <span className="text-xs font-bold text-brand-600 uppercase tracking-wider">Onboarding</span>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Nova Clínica</h1>
-        <p className="mt-1 text-sm text-gray-500">Tudo que os agentes IA precisam para funcionar perfeitamente</p>
+        <h1 className="text-2xl font-bold text-ink">Nova Clínica</h1>
+        <p className="mt-1 text-sm text-ink-secondary">Tudo que os agentes IA precisam para funcionar perfeitamente</p>
       </div>
 
       {/* Step indicator */}
@@ -237,7 +237,7 @@ export default function OnboardingPage() {
                 onClick={() => { if (isDone && !results.length) setCurrentStep(step.id); }}
                 className={cn(
                   "flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition-all",
-                  isActive ? "bg-brand-100 text-brand-700" : isDone ? "bg-emerald-50 text-emerald-700 cursor-pointer" : "bg-gray-50 text-gray-400"
+                  isActive ? "bg-brand-100 text-brand-700" : isDone ? "bg-emerald-50 text-emerald-700 cursor-pointer" : "bg-parchment text-ink-tertiary"
                 )}
               >
                 {isDone && !isActive ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
@@ -249,7 +249,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Form card */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-hairline bg-canvas p-6 shadow-sm">
 
         {/* ═══════ STEP 1: Clínica ═══════ */}
         {currentStep === 1 && (
@@ -257,23 +257,23 @@ export default function OnboardingPage() {
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600"><Building2 className="h-5 w-5" /></div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Dados da Clínica</h2>
-                <p className="text-xs text-gray-500">Informações que aparecem no atendimento da IA</p>
+                <h2 className="text-lg font-bold text-ink">Dados da Clínica</h2>
+                <p className="text-xs text-ink-secondary">Informações que aparecem no atendimento da IA</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Clínica *</label>
+                <label className="block text-sm font-medium text-ink mb-1">Nome da Clínica *</label>
                 <input type="text" value={clinicName} onChange={(e) => handleClinicName(e.target.value)} placeholder="Ex: Clínica Sorriso" className={INPUT_CLASS} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Slug / Instância</label>
+                <label className="block text-sm font-medium text-ink mb-1">Slug / Instância</label>
                 <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="clinica-sorriso" className={cn(INPUT_CLASS, "font-mono")} />
-                <p className="text-[10px] text-gray-400 mt-1">Nome da instância na Evolution API</p>
+                <p className="text-[10px] text-ink-tertiary mt-1">Nome da instância na Evolution API</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Segmento</label>
+                <label className="block text-sm font-medium text-ink mb-1">Segmento</label>
                 <select value={segment} onChange={(e) => setSegment(e.target.value)} className={INPUT_CLASS}>
                   <option value="">Selecione...</option>
                   <option value="odontologia">Odontologia</option>
@@ -288,12 +288,12 @@ export default function OnboardingPage() {
                 </select>
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Endereço completo *</label>
+                <label className="block text-sm font-medium text-ink mb-1">Endereço completo *</label>
                 <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Rua XV de Novembro, 1234 - Centro, Curitiba - PR" className={INPUT_CLASS} />
-                <p className="text-[10px] text-gray-400 mt-1">A IA envia esse endereço quando o paciente pergunta</p>
+                <p className="text-[10px] text-ink-tertiary mt-1">A IA envia esse endereço quando o paciente pergunta</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp da Clínica</label>
+                <label className="block text-sm font-medium text-ink mb-1">Telefone / WhatsApp da Clínica</label>
                 <input type="text" value={clinicPhone} onChange={(e) => setClinicPhone(e.target.value)} placeholder="(41) 99999-9999" className={INPUT_CLASS} />
               </div>
             </div>
@@ -306,14 +306,14 @@ export default function OnboardingPage() {
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600"><Clock className="h-5 w-5" /></div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Horários, Equipe & Procedimentos</h2>
-                <p className="text-xs text-gray-500">O agente de agendamento usa esses dados para marcar consultas</p>
+                <h2 className="text-lg font-bold text-ink">Horários, Equipe & Procedimentos</h2>
+                <p className="text-xs text-ink-secondary">O agente de agendamento usa esses dados para marcar consultas</p>
               </div>
             </div>
 
             {/* Working hours */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Horário de Funcionamento *</label>
+              <label className="block text-sm font-medium text-ink mb-2">Horário de Funcionamento *</label>
               <div className="space-y-2">
                 {WEEKDAYS.map((day) => {
                   const s = schedule[day.key];
@@ -321,18 +321,18 @@ export default function OnboardingPage() {
                     <div key={day.key} className="flex items-center gap-3">
                       <button
                         onClick={() => setSchedule((prev) => ({ ...prev, [day.key]: { ...prev[day.key], active: !prev[day.key].active } }))}
-                        className={cn("w-12 text-center rounded-lg py-1.5 text-xs font-bold transition-all", s.active ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-400")}
+                        className={cn("w-12 text-center rounded-lg py-1.5 text-xs font-bold transition-all", s.active ? "bg-brand-600 text-white" : "bg-parchment text-ink-tertiary")}
                       >
                         {day.label}
                       </button>
                       {s.active ? (
                         <div className="flex items-center gap-2">
-                          <input type="time" value={s.open} onChange={(e) => setSchedule((prev) => ({ ...prev, [day.key]: { ...prev[day.key], open: e.target.value } }))} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
-                          <span className="text-xs text-gray-400">até</span>
-                          <input type="time" value={s.close} onChange={(e) => setSchedule((prev) => ({ ...prev, [day.key]: { ...prev[day.key], close: e.target.value } }))} className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                          <input type="time" value={s.open} onChange={(e) => setSchedule((prev) => ({ ...prev, [day.key]: { ...prev[day.key], open: e.target.value } }))} className="rounded-lg border border-divider px-3 py-1.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                          <span className="text-xs text-ink-tertiary">até</span>
+                          <input type="time" value={s.close} onChange={(e) => setSchedule((prev) => ({ ...prev, [day.key]: { ...prev[day.key], close: e.target.value } }))} className="rounded-lg border border-divider px-3 py-1.5 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400">Fechado</span>
+                        <span className="text-xs text-ink-tertiary">Fechado</span>
                       )}
                     </div>
                   );
@@ -342,19 +342,19 @@ export default function OnboardingPage() {
 
             {/* Procedures */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Procedimentos / Serviços *</label>
-              <p className="text-[10px] text-gray-400 mb-2">A IA usa esses dados para informar o paciente e agendar</p>
+              <label className="block text-sm font-medium text-ink mb-2">Procedimentos / Serviços *</label>
+              <p className="text-[10px] text-ink-tertiary mb-2">A IA usa esses dados para informar o paciente e agendar</p>
               <div className="space-y-2">
                 {procedures.map((proc, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <input type="text" placeholder="Nome do procedimento" value={proc.name} onChange={(e) => { const n = [...procedures]; n[i].name = e.target.value; setProcedures(n); }} className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
-                    <input type="text" placeholder="Preço" value={proc.price} onChange={(e) => { const n = [...procedures]; n[i].price = e.target.value; setProcedures(n); }} className="w-24 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                    <input type="text" placeholder="Nome do procedimento" value={proc.name} onChange={(e) => { const n = [...procedures]; n[i].name = e.target.value; setProcedures(n); }} className="flex-1 rounded-lg border border-divider px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                    <input type="text" placeholder="Preço" value={proc.price} onChange={(e) => { const n = [...procedures]; n[i].price = e.target.value; setProcedures(n); }} className="w-24 rounded-lg border border-divider px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
                     <div className="flex items-center gap-1">
-                      <input type="number" placeholder="Min" value={proc.duration} onChange={(e) => { const n = [...procedures]; n[i].duration = e.target.value; setProcedures(n); }} className="w-16 rounded-lg border border-gray-200 px-2 py-2 text-sm text-center focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
-                      <span className="text-[10px] text-gray-400">min</span>
+                      <input type="number" placeholder="Min" value={proc.duration} onChange={(e) => { const n = [...procedures]; n[i].duration = e.target.value; setProcedures(n); }} className="w-16 rounded-lg border border-divider px-2 py-2 text-sm text-center focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                      <span className="text-[10px] text-ink-tertiary">min</span>
                     </div>
                     {procedures.length > 1 && (
-                      <button onClick={() => setProcedures(procedures.filter((_, j) => j !== i))} className="rounded-lg p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
+                      <button onClick={() => setProcedures(procedures.filter((_, j) => j !== i))} className="rounded-lg p-1.5 text-ink-tertiary hover:text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
                     )}
                   </div>
                 ))}
@@ -366,15 +366,15 @@ export default function OnboardingPage() {
 
             {/* Professionals */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Profissionais</label>
-              <p className="text-[10px] text-gray-400 mb-2">A IA menciona os profissionais ao agendar</p>
+              <label className="block text-sm font-medium text-ink mb-2">Profissionais</label>
+              <p className="text-[10px] text-ink-tertiary mb-2">A IA menciona os profissionais ao agendar</p>
               <div className="space-y-2">
                 {professionals.map((prof, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <input type="text" placeholder="Nome" value={prof.name} onChange={(e) => { const n = [...professionals]; n[i].name = e.target.value; setProfessionals(n); }} className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
-                    <input type="text" placeholder="Cargo/Especialidade" value={prof.role} onChange={(e) => { const n = [...professionals]; n[i].role = e.target.value; setProfessionals(n); }} className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                    <input type="text" placeholder="Nome" value={prof.name} onChange={(e) => { const n = [...professionals]; n[i].name = e.target.value; setProfessionals(n); }} className="flex-1 rounded-lg border border-divider px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
+                    <input type="text" placeholder="Cargo/Especialidade" value={prof.role} onChange={(e) => { const n = [...professionals]; n[i].role = e.target.value; setProfessionals(n); }} className="flex-1 rounded-lg border border-divider px-3 py-2 text-sm focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-100" />
                     {professionals.length > 1 && (
-                      <button onClick={() => setProfessionals(professionals.filter((_, j) => j !== i))} className="rounded-lg p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
+                      <button onClick={() => setProfessionals(professionals.filter((_, j) => j !== i))} className="rounded-lg p-1.5 text-ink-tertiary hover:text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
                     )}
                   </div>
                 ))}
@@ -386,7 +386,7 @@ export default function OnboardingPage() {
 
             {/* Payment methods */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Formas de Pagamento</label>
+              <label className="block text-sm font-medium text-ink mb-2">Formas de Pagamento</label>
               <div className="flex flex-wrap gap-2">
                 {PAYMENT_OPTIONS.map((pm) => (
                   <button
@@ -394,7 +394,7 @@ export default function OnboardingPage() {
                     onClick={() => setPaymentMethods((prev) => prev.includes(pm) ? prev.filter((p) => p !== pm) : [...prev, pm])}
                     className={cn(
                       "rounded-lg px-3 py-1.5 text-xs font-medium transition-all border",
-                      paymentMethods.includes(pm) ? "bg-brand-600 text-white border-brand-600" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                      paymentMethods.includes(pm) ? "bg-brand-600 text-white border-brand-600" : "bg-canvas text-ink-secondary border-divider hover:border-hairline"
                     )}
                   >
                     {pm}
@@ -411,32 +411,32 @@ export default function OnboardingPage() {
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600"><User className="h-5 w-5" /></div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Acesso & Login</h2>
-                <p className="text-xs text-gray-500">Credenciais do responsável da clínica</p>
+                <h2 className="text-lg font-bold text-ink">Acesso & Login</h2>
+                <p className="text-xs text-ink-secondary">Credenciais do responsável da clínica</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Responsável *</label>
+                <label className="block text-sm font-medium text-ink mb-1">Nome do Responsável *</label>
                 <input type="text" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} placeholder="Dr. João Silva" className={INPUT_CLASS} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Pessoal *</label>
+                <label className="block text-sm font-medium text-ink mb-1">WhatsApp Pessoal *</label>
                 <input type="text" value={ownerPhone} onChange={(e) => setOwnerPhone(e.target.value)} placeholder="5541999999999" className={INPUT_CLASS} />
-                <p className="text-[10px] text-gray-400 mt-1">Recebe alertas de leads quentes</p>
+                <p className="text-[10px] text-ink-tertiary mt-1">Recebe alertas de leads quentes</p>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email de Login *</label>
+              <label className="block text-sm font-medium text-ink mb-1">Email de Login *</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@clinicasorriso.com" className={INPUT_CLASS} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Senha *</label>
+              <label className="block text-sm font-medium text-ink mb-1">Senha *</label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className={INPUT_CLASS} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">API Key Blackbox <span className="text-gray-400 font-normal">(pode adicionar depois)</span></label>
+              <label className="block text-sm font-medium text-ink mb-1">API Key Blackbox <span className="text-ink-tertiary font-normal">(pode adicionar depois)</span></label>
               <input type="text" value={blackboxApiKey} onChange={(e) => setBlackboxApiKey(e.target.value)} placeholder="sk-..." className={cn(INPUT_CLASS, "font-mono")} />
             </div>
           </div>
@@ -448,21 +448,21 @@ export default function OnboardingPage() {
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><Bot className="h-5 w-5" /></div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Configuração dos Agentes IA</h2>
-                <p className="text-xs text-gray-500">Quanto mais detalhado, melhor o agente performa</p>
+                <h2 className="text-lg font-bold text-ink">Configuração dos Agentes IA</h2>
+                <p className="text-xs text-ink-secondary">Quanto mais detalhado, melhor o agente performa</p>
               </div>
             </div>
 
             {/* Tom de voz */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tom de Voz *</label>
+              <label className="block text-sm font-medium text-ink mb-1">Tom de Voz *</label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {[
                   { label: "Profissional e acolhedor", emoji: "😊" },
                   { label: "Informal e simpático", emoji: "🤙" },
                   { label: "Formal e técnico", emoji: "👨‍⚕️" },
                 ].map((tone) => (
-                  <button key={tone.label} onClick={() => setToneOfVoice(tone.label)} className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", toneOfVoice.startsWith(tone.label) ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200")}>
+                  <button key={tone.label} onClick={() => setToneOfVoice(tone.label)} className={cn("rounded-lg px-3 py-1.5 text-xs font-medium transition-all", toneOfVoice.startsWith(tone.label) ? "bg-brand-600 text-white" : "bg-parchment text-ink-secondary hover:bg-parchment")}>
                     {tone.emoji} {tone.label}
                   </button>
                 ))}
@@ -472,8 +472,8 @@ export default function OnboardingPage() {
 
             {/* Welcome message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mensagem de Boas-vindas</label>
-              <p className="text-[10px] text-gray-400 mb-1">Primeira mensagem que o agente envia quando um lead novo aparece</p>
+              <label className="block text-sm font-medium text-ink mb-1">Mensagem de Boas-vindas</label>
+              <p className="text-[10px] text-ink-tertiary mb-1">Primeira mensagem que o agente envia quando um lead novo aparece</p>
               <textarea value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} rows={3} placeholder={`Olá! Bem-vindo(a) à ${clinicName || "Clínica"}. Como posso ajudar?`} className={cn(INPUT_CLASS, "resize-y")} />
             </div>
 
@@ -531,7 +531,7 @@ QUANDO NÃO ESTIVER EM HORÁRIO DE ATENDIMENTO:
 - Informe os horários de funcionamento
 - Diga que assim que abrir, a equipe entrará em contato
 - Anote o interesse do paciente para follow-up`}
-                className={cn(INPUT_CLASS, "resize-y min-h-[300px] font-mono text-xs leading-relaxed bg-white")}
+                className={cn(INPUT_CLASS, "resize-y min-h-[300px] font-mono text-xs leading-relaxed bg-canvas")}
               />
               <div className="flex items-center justify-between mt-2">
                 <p className="text-[10px] text-brand-600/60">{systemPrompt.length} caracteres</p>
@@ -580,8 +580,8 @@ QUANDO NÃO ESTIVER EM HORÁRIO DE ATENDIMENTO:
 
             {/* FAQ — expanded */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Perguntas Frequentes (FAQ)</label>
-              <p className="text-[10px] text-gray-400 mb-1">Perguntas que pacientes fazem frequentemente — a IA usa como base de conhecimento</p>
+              <label className="block text-sm font-medium text-ink mb-1">Perguntas Frequentes (FAQ)</label>
+              <p className="text-[10px] text-ink-tertiary mb-1">Perguntas que pacientes fazem frequentemente — a IA usa como base de conhecimento</p>
               <textarea
                 value={faq}
                 onChange={(e) => setFaq(e.target.value)}
@@ -600,8 +600,8 @@ Aceita emergência? Sim, entre em contato pelo WhatsApp.`}
 
             {/* Special rules — expanded */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Regras Especiais & Restrições</label>
-              <p className="text-[10px] text-gray-400 mb-1">Regras que os agentes devem seguir SEMPRE — funciona como um guardrail da IA</p>
+              <label className="block text-sm font-medium text-ink mb-1">Regras Especiais & Restrições</label>
+              <p className="text-[10px] text-ink-tertiary mb-1">Regras que os agentes devem seguir SEMPRE — funciona como um guardrail da IA</p>
               <textarea
                 value={specialRules}
                 onChange={(e) => setSpecialRules(e.target.value)}
@@ -621,7 +621,7 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
 
             {/* Agent toggles */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Agentes para ativar</label>
+              <label className="block text-sm font-medium text-ink mb-2">Agentes para ativar</label>
               <div className="space-y-2">
                 {[
                   { key: "atendimento", name: "Atendimento 24/7", desc: "Responde mensagens no WhatsApp automaticamente", icon: MessageSquare },
@@ -633,17 +633,17 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
                   const Icon = agent.icon;
                   const enabled = agentConfig[agent.key as keyof typeof agentConfig];
                   return (
-                    <div key={agent.key} className={cn("flex items-center gap-3 rounded-xl border p-3 transition-all", enabled ? "border-emerald-200 bg-emerald-50/50" : "border-gray-100 bg-gray-50/50")}>
-                      <Icon className={cn("h-5 w-5 shrink-0", enabled ? "text-emerald-600" : "text-gray-400")} />
+                    <div key={agent.key} className={cn("flex items-center gap-3 rounded-xl border p-3 transition-all", enabled ? "border-emerald-200 bg-emerald-50/50" : "border-hairline bg-parchment/50")}>
+                      <Icon className={cn("h-5 w-5 shrink-0", enabled ? "text-emerald-600" : "text-ink-tertiary")} />
                       <div className="flex-1 min-w-0">
-                        <p className={cn("text-sm font-medium", enabled ? "text-gray-900" : "text-gray-500")}>{agent.name}</p>
-                        <p className="text-[10px] text-gray-400">{agent.desc}</p>
+                        <p className={cn("text-sm font-medium", enabled ? "text-ink" : "text-ink-secondary")}>{agent.name}</p>
+                        <p className="text-[10px] text-ink-tertiary">{agent.desc}</p>
                       </div>
                       <button
                         onClick={() => setAgentConfig((prev) => ({ ...prev, [agent.key]: !prev[agent.key as keyof typeof prev] }))}
                         className={cn("relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0", enabled ? "bg-emerald-500" : "bg-gray-300")}
                       >
-                        <span className={cn("inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm", enabled ? "translate-x-6" : "translate-x-1")} />
+                        <span className={cn("inline-block h-4 w-4 transform rounded-full bg-canvas transition-transform shadow-sm", enabled ? "translate-x-6" : "translate-x-1")} />
                       </button>
                     </div>
                   );
@@ -661,47 +661,47 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><CheckCircle2 className="h-5 w-5" /></div>
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">Confirmar Onboarding</h2>
-                    <p className="text-xs text-gray-500">Revise antes de criar — tudo reflete nos agentes IA</p>
+                    <h2 className="text-lg font-bold text-ink">Confirmar Onboarding</h2>
+                    <p className="text-xs text-ink-secondary">Revise antes de criar — tudo reflete nos agentes IA</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Clínica</p>
+                  <div className="rounded-xl bg-parchment p-4">
+                    <p className="text-xs font-bold text-ink-secondary uppercase tracking-wider mb-2">Clínica</p>
                     <div className="grid grid-cols-2 gap-y-1.5 text-sm">
-                      <span className="text-gray-500">Nome</span><span className="font-medium text-gray-900">{clinicName}</span>
-                      <span className="text-gray-500">Segmento</span><span className="font-medium text-gray-900">{segment || "—"}</span>
-                      <span className="text-gray-500">Endereço</span><span className="font-medium text-gray-900 col-span-1 truncate">{address}</span>
-                      <span className="text-gray-500">Instância</span><span className="font-medium text-gray-900 font-mono">{slug}</span>
+                      <span className="text-ink-secondary">Nome</span><span className="font-medium text-ink">{clinicName}</span>
+                      <span className="text-ink-secondary">Segmento</span><span className="font-medium text-ink">{segment || "—"}</span>
+                      <span className="text-ink-secondary">Endereço</span><span className="font-medium text-ink col-span-1 truncate">{address}</span>
+                      <span className="text-ink-secondary">Instância</span><span className="font-medium text-ink font-mono">{slug}</span>
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Horários</p>
-                    <p className="text-sm text-gray-700">{buildWorkingHours()}</p>
+                  <div className="rounded-xl bg-parchment p-4">
+                    <p className="text-xs font-bold text-ink-secondary uppercase tracking-wider mb-2">Horários</p>
+                    <p className="text-sm text-ink">{buildWorkingHours()}</p>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Procedimentos ({procedures.filter((p) => p.name).length})</p>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">{buildProcedures() || "—"}</p>
+                  <div className="rounded-xl bg-parchment p-4">
+                    <p className="text-xs font-bold text-ink-secondary uppercase tracking-wider mb-2">Procedimentos ({procedures.filter((p) => p.name).length})</p>
+                    <p className="text-sm text-ink whitespace-pre-line">{buildProcedures() || "—"}</p>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Acesso</p>
+                  <div className="rounded-xl bg-parchment p-4">
+                    <p className="text-xs font-bold text-ink-secondary uppercase tracking-wider mb-2">Acesso</p>
                     <div className="grid grid-cols-2 gap-y-1.5 text-sm">
-                      <span className="text-gray-500">Responsável</span><span className="font-medium text-gray-900">{ownerName}</span>
-                      <span className="text-gray-500">Email</span><span className="font-medium text-gray-900">{email}</span>
-                      <span className="text-gray-500">WhatsApp</span><span className="font-medium text-gray-900">{ownerPhone}</span>
-                      <span className="text-gray-500">Blackbox</span><span className="font-medium text-gray-900">{blackboxApiKey ? "sk-***" + blackboxApiKey.slice(-4) : "Não definida"}</span>
+                      <span className="text-ink-secondary">Responsável</span><span className="font-medium text-ink">{ownerName}</span>
+                      <span className="text-ink-secondary">Email</span><span className="font-medium text-ink">{email}</span>
+                      <span className="text-ink-secondary">WhatsApp</span><span className="font-medium text-ink">{ownerPhone}</span>
+                      <span className="text-ink-secondary">Blackbox</span><span className="font-medium text-ink">{blackboxApiKey ? "sk-***" + blackboxApiKey.slice(-4) : "Não definida"}</span>
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Agentes IA</p>
+                  <div className="rounded-xl bg-parchment p-4">
+                    <p className="text-xs font-bold text-ink-secondary uppercase tracking-wider mb-2">Agentes IA</p>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(agentConfig).map(([key, enabled]) => (
-                        <span key={key} className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", enabled ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-400")}>
+                        <span key={key} className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", enabled ? "bg-emerald-100 text-emerald-700" : "bg-parchment text-ink-tertiary")}>
                           {key.replace("_", "-")} {enabled ? "ON" : "OFF"}
                         </span>
                       ))}
@@ -726,8 +726,8 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
             {isSubmitting && (
               <div className="flex flex-col items-center justify-center py-12">
                 <Loader2 className="h-10 w-10 text-brand-600 animate-spin mb-4" />
-                <p className="text-lg font-bold text-gray-900">Criando clínica...</p>
-                <p className="text-sm text-gray-500 mt-1">Configurando todos os serviços automaticamente</p>
+                <p className="text-lg font-bold text-ink">Criando clínica...</p>
+                <p className="text-sm text-ink-secondary mt-1">Configurando todos os serviços automaticamente</p>
               </div>
             )}
 
@@ -738,8 +738,8 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
                     {allOk ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">{allOk ? "Clínica criada com sucesso!" : "Concluído com avisos"}</h2>
-                    <p className="text-xs text-gray-500">{allOk ? "Todos os serviços configurados" : "Alguns passos precisam de atenção"}</p>
+                    <h2 className="text-lg font-bold text-ink">{allOk ? "Clínica criada com sucesso!" : "Concluído com avisos"}</h2>
+                    <p className="text-xs text-ink-secondary">{allOk ? "Todos os serviços configurados" : "Alguns passos precisam de atenção"}</p>
                   </div>
                 </div>
 
@@ -763,7 +763,7 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
                 )}
 
                 <div className="flex gap-3 mt-4">
-                  <Link href="/admin" className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 text-center hover:bg-gray-50 transition-all">
+                  <Link href="/admin" className="flex-1 rounded-xl border border-divider bg-canvas px-4 py-2.5 text-sm font-medium text-ink text-center hover:bg-parchment transition-all">
                     Voltar ao Painel
                   </Link>
                 </div>
@@ -778,9 +778,9 @@ Horário de almoço: entre 12h e 13h o agendamento fica limitado.`}
 
         {/* Nav buttons */}
         {(currentStep < 5 || (!results.length && !isSubmitting)) && (
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-hairline">
             {currentStep > 1 && !results.length ? (
-              <button onClick={() => setCurrentStep((s) => s - 1)} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
+              <button onClick={() => setCurrentStep((s) => s - 1)} className="inline-flex items-center gap-2 rounded-xl border border-divider bg-canvas px-4 py-2.5 text-sm font-medium text-ink hover:bg-parchment transition-all">
                 <ArrowLeft className="h-4 w-4" /> Voltar
               </button>
             ) : <div />}
