@@ -72,20 +72,18 @@ const CHANGELOG = [
 ];
 
 function InsightsSection({ data }: { data: { leadsToday: number; appointmentsToday: number; messagesToday: number; hotLeads: number } }) {
-  // Mock weekly comparisons (em produção viria da API)
   const weekMetrics = [
-    { label: "Leads", current: data.leadsToday * 7 || 23, previous: 18, icon: Users, color: "text-brand-700 bg-brand-50" },
-    { label: "Agendamentos", current: data.appointmentsToday * 7 || 12, previous: 9, icon: CalendarCheck, color: "text-blue-600 bg-blue-50" },
-    { label: "Msgs IA", current: data.messagesToday * 7 || 847, previous: 623, icon: MessageSquare, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Conversão", current: 34, previous: 28, icon: TrendingUp, color: "text-amber-600 bg-amber-50", suffix: "%" },
+    { label: "Leads", current: data.leadsToday, previous: 0, icon: Users, color: "text-brand-700 bg-brand-50" },
+    { label: "Agendamentos", current: data.appointmentsToday, previous: 0, icon: CalendarCheck, color: "text-blue-600 bg-blue-50" },
+    { label: "Msgs IA", current: data.messagesToday, previous: 0, icon: MessageSquare, color: "text-emerald-600 bg-emerald-50" },
+    { label: "Leads Quentes", current: data.hotLeads, previous: 0, icon: TrendingUp, color: "text-amber-600 bg-amber-50" },
   ];
 
-  const milestones = [
-    data.leadsToday * 30 >= 100 ? { text: "Você ultrapassou 100 leads este mês!", icon: Users, color: "brand-gradient" } : null,
-    data.messagesToday > 50 ? { text: "Seus agentes enviaram +50 mensagens hoje!", icon: Bot, color: "bg-gradient-to-br from-emerald-500 to-emerald-600" } : null,
-    { text: "Seu no-show caiu 15% com confirmação automática", icon: CalendarCheck, color: "bg-gradient-to-br from-blue-500 to-blue-600" },
-    { text: "Follow-up reativou 3 pacientes esta semana", icon: Zap, color: "bg-gradient-to-br from-amber-500 to-amber-600" },
-  ].filter(Boolean) as { text: string; icon: any; color: string }[];
+  const milestones: { text: string; icon: any; color: string }[] = [];
+  if (data.leadsToday > 0) milestones.push({ text: `${data.leadsToday} leads novos hoje!`, icon: Users, color: "brand-gradient" });
+  if (data.messagesToday > 10) milestones.push({ text: `${data.messagesToday} mensagens da IA hoje`, icon: Bot, color: "bg-gradient-to-br from-emerald-500 to-emerald-600" });
+  if (data.appointmentsToday > 0) milestones.push({ text: `${data.appointmentsToday} agendamentos hoje`, icon: CalendarCheck, color: "bg-gradient-to-br from-blue-500 to-blue-600" });
+  if (data.hotLeads > 0) milestones.push({ text: `${data.hotLeads} leads quentes no funil`, icon: Zap, color: "bg-gradient-to-br from-amber-500 to-amber-600" });
 
   return (
     <div className="space-y-6">
@@ -106,8 +104,8 @@ function InsightsSection({ data }: { data: { leadsToday: number; appointmentsTod
                   </span>
                 </div>
                 <div className="flex items-end gap-3 mt-2">
-                  <p className="text-[28px] font-bold text-ink leading-none">{m.current}{m.suffix || ""}</p>
-                  <p className="text-[12px] text-ink-tertiary pb-0.5">vs {m.previous}{m.suffix || ""}</p>
+                  <p className="text-[28px] font-bold text-ink leading-none">{m.current}{(m as any).suffix || ""}</p>
+                  <p className="text-[12px] text-ink-tertiary pb-0.5">vs {m.previous}</p>
                 </div>
               </div>
             );

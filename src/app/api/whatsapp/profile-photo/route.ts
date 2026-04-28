@@ -1,64 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEvolutionConfig, resolveInstance } from "@/lib/evolution";
 
 export async function GET(req: NextRequest) {
   const phone = req.nextUrl.searchParams.get("phone");
+  const tenantId = req.nextUrl.searchParams.get("tenant_id");
 
   if (!phone) {
-    return NextResponse.json({ error: "phone é obrigatório" }, { status: 400 });
+    return NextResponse.json({ photoUrl: null });
   }
 
-  const evolutionUrl = "https://evolution.fyreoficial.com.br";
-  const evolutionKey = "KS2rnpBe7QXyj0pnGOOPAqBDBjC0r0UM";
-  const instance = process.env.EVOLUTION_INSTANCE;
+  const { url, key } = getEvolutionConfig();
+  const instance = await resolveInstance(tenantId);
 
-  if (!instance) {
+  if (!url || !key || !instance) {
     return NextResponse.json({ photoUrl: null });
   }
 
   try {
-    const res = await fetch(
-      `${evolutionUrl}/chat/fetchProfilePictureUrl/${instance}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: evolutionKey,
-        },
-        body: JSON.stringify({ number: phone }),
-      }
-    );
+    const res = await fetch(`${url}/chat/fetchProfilePictureUrl/${instance}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: key },
+      body: JSON.stringify({ number: phone }),
+    });
 
     if (!res.ok) {
-      return NextResponse.json(
-        { photoUrl: null },
-        {
-          headers: {
-            "Cache-Control": "public, max-age=3600, s-maxage=3600",
-          },
-        }
-      );
+      return NextResponse.json({ photoUrl: null }, { headers: { "Cache-Control": "public, max-age=3600" } });
     }
 
     const data = await res.json();
     const photoUrl = data?.profilePictureUrl || data?.profilePicture || data?.url || null;
 
-    return NextResponse.json(
-      { photoUrl },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=3600, s-maxage=3600",
-        },
-      }
-    );
-  } catch (error) {
-    console.error("Profile photo fetch error:", error);
-    return NextResponse.json(
-      { photoUrl: null },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=600, s-maxage=600",
-        },
-      }
-    );
+    return NextResponse.json({ photoUrl }, { headers: { "Cache-Control": "public, max-age=3600" } });
+  } catch {
+    return NextResponse.json({ photoUrl: null }, { headers: { "Cache-Control": "public, max-age=600" } });
   }
 }

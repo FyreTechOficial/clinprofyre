@@ -1,48 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEvolutionConfig, resolveInstance } from "@/lib/evolution";
 
 export async function GET(req: NextRequest) {
   try {
-    const evolutionUrl = process.env.EVOLUTION_API_URL;
-    const evolutionKey = process.env.EVOLUTION_API_KEY;
-    const instance = process.env.EVOLUTION_INSTANCE;
+    const { url, key } = getEvolutionConfig();
+    const tenantId = req.nextUrl.searchParams.get("tenant_id");
+    const instance = await resolveInstance(tenantId);
 
-    if (!evolutionUrl || !evolutionKey || !instance) {
-      return NextResponse.json({ error: "Evolution API não configurada" }, { status: 500 });
+    if (!url || !key || !instance) {
+      return NextResponse.json({ connected: false, state: "error", error: "Evolution API não configurada ou instância não encontrada" });
     }
 
-    // Check connection state
-    const res = await fetch(`${evolutionUrl}/instance/connectionState/${instance}`, {
-      headers: { apikey: evolutionKey },
+    const res = await fetch(`${url}/instance/connectionState/${instance}`, {
+      headers: { apikey: key },
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      console.error("Evolution status error:", res.status, text);
-      return NextResponse.json({
-        connected: false,
-        state: "error",
-        instance,
-        error: `Evolution API retornou ${res.status}`,
-      });
+      return NextResponse.json({ connected: false, state: "error", instance, error: `Evolution API retornou ${res.status}` });
     }
 
     const data = await res.json();
-
-    // Evolution API returns { instance: { state: "open" | "close" | "connecting" } }
     const state = data?.instance?.state ?? data?.state ?? "unknown";
-    const connected = state === "open";
 
-    return NextResponse.json({
-      connected,
-      state,
-      instance,
-    });
+    return NextResponse.json({ connected: state === "open", state, instance });
   } catch (error) {
-    console.error("Status check error:", error);
-    return NextResponse.json({
-      connected: false,
-      state: "error",
-      error: "Não foi possível verificar o status",
-    });
+    return NextResponse.json({ connected: false, state: "error", error: "Não foi possível verificar o status" });
   }
 }

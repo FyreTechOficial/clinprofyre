@@ -293,7 +293,7 @@ export default function WhatsAppPage() {
     setErrorMsg(null);
 
     try {
-      const res = await fetch("/api/whatsapp/status");
+      const res = await fetch(`/api/whatsapp/status?tenant_id=${tenantId}`);
       const data = await res.json();
       setInstanceName(data.instance ?? "desconhecido");
 
@@ -318,7 +318,7 @@ export default function WhatsAppPage() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("/api/whatsapp/status");
+        const res = await fetch(`/api/whatsapp/status?tenant_id=${tenantId}`);
         const data = await res.json();
         if (data.connected) {
           setConnectionState("connected");
@@ -336,7 +336,7 @@ export default function WhatsAppPage() {
     setQrBase64(null);
 
     try {
-      const res = await fetch("/api/whatsapp/qrcode");
+      const res = await fetch(`/api/whatsapp/qrcode?tenant_id=${tenantId}`);
       const data = await res.json();
 
       if (data.qrBase64) {
@@ -359,7 +359,7 @@ export default function WhatsAppPage() {
   /* ---------- Logout ---------- */
   const handleLogout = async () => {
     try {
-      await fetch("/api/whatsapp/logout", { method: "POST" });
+      await fetch("/api/whatsapp/logout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tenant_id: tenantId }) });
       setConnectionState("disconnected");
       setQrBase64(null);
     } catch {}

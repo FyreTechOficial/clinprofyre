@@ -122,7 +122,7 @@ export default function AgentsPage() {
   useEffect(() => {
     async function checkConnection() {
       try {
-        const res = await fetch("/api/whatsapp/status");
+        const res = await fetch(`/api/whatsapp/status?tenant_id=${tenantId}`);
         const data = await res.json();
         setConnectionStatus(data.connected ? "connected" : "disconnected");
       } catch { setConnectionStatus("disconnected"); }
@@ -177,7 +177,7 @@ export default function AgentsPage() {
     setShowQrModal(true);
     setQrBase64(null);
     try {
-      const res = await fetch("/api/whatsapp/qrcode");
+      const res = await fetch(`/api/whatsapp/qrcode?tenant_id=${tenantId}`);
       const data = await res.json();
       if (data.qrBase64) setQrBase64(data.qrBase64);
     } catch {}
@@ -238,7 +238,7 @@ export default function AgentsPage() {
             <button
               onClick={async () => {
                 setConnectionStatus("checking");
-                const res = await fetch("/api/whatsapp/status");
+                const res = await fetch(`/api/whatsapp/status?tenant_id=${tenantId}`);
                 const data = await res.json();
                 setConnectionStatus(data.connected ? "connected" : "disconnected");
               }}
