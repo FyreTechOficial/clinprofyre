@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta Comercial — EquilibVet × ClinPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-600: #9333ea;
+    --brand-700: #7c3aed;
+    --brand-800: #6b21a8;
+    --brand-950: #3b0764;
+    --ink: #1d1d1f;
+    --ink-secondary: #6e6e73;
+    --ink-tertiary: #86868b;
+    --divider: #e8e8ed;
+    --parchment: #f5f5f7;
+    --canvas: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--parchment);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--canvas);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--brand-950) 0%, var(--brand-700) 50%, var(--brand-600) 100%);
+    padding: 60px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    filter: blur(40px);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: -40px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    filter: blur(30px);
+  }
+  .header-content { position: relative; z-index: 1; }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  .logo-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .logo-text span { color: rgba(255,255,255,0.5); font-weight: 300; font-size: 12px; display: block; letter-spacing: 2px; font-family: 'Inter', sans-serif; }
+  .badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    backdrop-filter: blur(10px);
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    max-width: 500px;
+  }
+  .header-meta {
+    margin-top: 30px;
+    display: flex;
+    gap: 30px;
+  }
+  .header-meta div {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+  }
+  .header-meta strong {
+    display: block;
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+  }
+
+  /* Sections */
+  .section {
+    padding: 40px 50px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .section:last-child { border-bottom: none; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--brand-600);
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+    margin-bottom: 16px;
+  }
+  .section p {
+    font-size: 15px;
+    color: var(--ink-secondary);
+    line-height: 1.7;
+  }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .card {
+    border: 1px solid var(--divider);
+    border-radius: 16px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--brand-600); }
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand-950), var(--brand-700));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 18px;
+  }
+  .card h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .card p { font-size: 13px; color: var(--ink-secondary); line-height: 1.5; }
+
+  /* Full width card */
+  .card-full {
+    grid-column: 1 / -1;
+    background: var(--parchment);
+    border: 1px solid var(--divider);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .card-full h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+
+  /* Integration section */
+  .integration-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+  .integration-item:last-child { border-bottom: none; }
+  .integration-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .integration-icon.purple { background: #f3e8ff; }
+  .integration-icon.blue { background: #dbeafe; }
+  .integration-icon.green { background: #dcfce7; }
+  .integration-icon.amber { background: #fef3c7; }
+  .integration-item h4 { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .integration-item p { font-size: 13px; color: var(--ink-secondary); margin-top: 2px; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-top: 4px;
+  }
+  .tag-green { background: #dcfce7; color: #166534; }
+  .tag-amber { background: #fef3c7; color: #92400e; }
+
+  /* Pricing */
+  .pricing-card {
+    background: linear-gradient(135deg, var(--brand-950), var(--brand-700), var(--brand-600));
+    border-radius: 20px;
+    padding: 40px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .pricing-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    filter: blur(30px);
+  }
+  .pricing-card .price {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    position: relative;
+    z-index: 1;
+  }
+  .pricing-card .price span { font-size: 18px; font-weight: 400; opacity: 0.6; }
+  .pricing-card .price-label {
+    font-size: 14px;
+    opacity: 0.6;
+    margin-top: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .pricing-includes {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .pricing-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+  }
+  .pricing-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  /* List */
+  .check-list { list-style: none; margin-top: 16px; }
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--ink-secondary);
+  }
+  .check-list .dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-950), var(--brand-600));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 10px;
+    color: white;
+  }
+
+  /* Timeline */
+  .timeline { margin-top: 20px; }
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 20px;
+    position: relative;
+  }
+  .timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 40px;
+    bottom: 0;
+    width: 2px;
+    background: var(--divider);
+  }
+  .timeline-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-950), var(--brand-600));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline-content h4 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .timeline-content p { font-size: 13px; color: var(--ink-secondary); }
+
+  /* Note */
+  .note {
+    background: var(--parchment);
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--ink-secondary);
+  }
+  .note strong { color: var(--ink); }
+
+  /* Footer */
+  .footer {
+    padding: 40px 50px;
+    text-align: center;
+    border-top: 1px solid var(--divider);
+  }
+  .footer p { font-size: 13px; color: var(--ink-tertiary); }
+  .footer .cta {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--brand-950), var(--brand-700), var(--brand-600));
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 40px;
+    border-radius: 100px;
+    text-decoration: none;
+    margin: 20px 0;
+    transition: filter 0.2s;
+  }
+  .footer .cta:hover { filter: brightness(1.1); }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .pricing-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card-icon, .dot, .timeline-dot, .pricing-check, .integration-icon { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .footer .cta { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 600px) {
+    .header, .section, .footer { padding-left: 24px; padding-right: 24px; }
+    .header h1 { font-size: 24px; }
+    .cards { grid-template-columns: 1fr; }
+    .pricing-includes { grid-template-columns: 1fr; }
+    .header-meta { flex-direction: column; gap: 12px; }
+    .pricing-card { padding: 24px; }
+    .pricing-card .price { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <div class="logo-text">ClinPRO<span>POR FYRETECH</span></div>
+        </div>
+        <div class="badge">Proposta Comercial</div>
+      </div>
+      <h1>Proposta de Implementação<br>EquilibVet</h1>
+      <p>Sistema de atendimento inteligente com IA para clínica veterinária — particular e convênio PetLove.</p>
+      <div class="header-meta">
+        <div><strong>EquilibVet</strong>Clínica Veterinária — São Paulo, SP</div>
+        <div><strong>FyreTech</strong>Implementação e suporte</div>
+        <div><strong>Abril 2026</strong>Válida por 15 dias</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOBRE -->
+  <div class="section">
+    <div class="section-label">Sobre o Projeto</div>
+    <h2>O que vamos fazer pela EquilibVet</h2>
+    <p>Vamos implementar o ClinPRO personalizado para a realidade da EquilibVet — uma clínica veterinária que atende por convênio PetLove e particular, com serviços de acupuntura, fisioterapia e atendimento clínico geral.</p>
+    <p style="margin-top:12px">O sistema será adaptado com nomenclaturas e fluxos específicos para o universo pet, mantendo toda a potência dos agentes de IA para atendimento, qualificação, confirmação e follow-up via WhatsApp.</p>
+  </div>
+
+  <!-- O QUE INCLUI -->
+  <div class="section">
+    <div class="section-label">O que está incluso</div>
+    <h2>Funcionalidades do ClinPRO para EquilibVet</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h3>Atendimento 24/7 por IA</h3>
+        <p>IA responde WhatsApp em segundos. Tira dúvidas sobre procedimentos, convênio PetLove, valores e horários.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⭐</div>
+        <h3>Qualificação Automática</h3>
+        <p>Identifica interesse (acupuntura, fisio, consulta), classifica urgência e preenche cadastro do tutor + pet.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <h3>Confirmação de Consultas</h3>
+        <p>Confirma agendamentos 48h e 24h antes. Reagenda automaticamente. Reduz no-show em até 40%.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Follow-up Automático</h3>
+        <p>D1, D3, D7 após consulta. Recupera tutores que não retornaram. Reativa inativos há +90 dias.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Dashboard em Tempo Real</h3>
+        <p>Métricas de leads, agendamentos, mensagens dos agentes e funil de conversão. Tudo ao vivo.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h3>Pipeline de Vendas</h3>
+        <p>Kanban com 8 estágios. A IA move os leads conforme qualifica. Drag & drop para ajuste manual.</p>
+      </div>
+
+      <div class="card-full">
+        <h3>🏷️ Nomenclaturas Personalizadas</h3>
+        <p style="font-size:13px;color:var(--ink-secondary)">O sistema será adaptado para o contexto veterinário: "Paciente" → "Pet/Tutor", "Consulta" → "Atendimento", "Procedimento" → "Serviço", entre outros ajustes de linguagem nos agentes, dashboard e pipeline.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRAÇÕES -->
+  <div class="section">
+    <div class="section-label">Integrações</div>
+    <h2>Conectando com VetSmart e PetLove</h2>
+    <p>Além das funcionalidades core do ClinPRO, vamos trabalhar nas integrações com os sistemas que a EquilibVet já utiliza.</p>
+
+    <div style="margin-top:20px">
+      <div class="integration-item">
+        <div class="integration-icon green">🩺</div>
+        <div>
+          <h4>VetSmart — Prontuário Eletrônico</h4>
+          <p>Integração para enviar dados do atendimento ClinPRO direto para o prontuário no VetSmart. Cadastro do tutor, pet, histórico de interações e procedimentos realizados.</p>
+          <span class="tag tag-amber">Verificação de API necessária</span>
+        </div>
+      </div>
+      <div class="integration-item">
+        <div class="integration-icon blue">💙</div>
+        <div>
+          <h4>PetLove — Pesquisa de Convênio</h4>
+          <p>Quando o tutor envia os dados pelo WhatsApp, a IA faz a pesquisa de cobertura no convênio PetLove e retorna a informação ao tutor automaticamente dentro da conversa.</p>
+          <span class="tag tag-amber">Verificação de API necessária</span>
+        </div>
+      </div>
+      <div class="integration-item">
+        <div class="integration-icon purple">📅</div>
+        <div>
+          <h4>Agenda ClinPRO ↔ VetSmart</h4>
+          <p>Sincronização bidirecional da agenda. Quando a IA agenda no ClinPRO, reflete no VetSmart — e vice-versa. Sem duplicidade de agendamentos.</p>
+          <span class="tag tag-amber">Verificação de API necessária</span>
+        </div>
+      </div>
+      <div class="integration-item">
+        <div class="integration-icon green">✅</div>
+        <div>
+          <h4>WhatsApp via Evolution API</h4>
+          <p>Conexão direta com o WhatsApp da clínica via QR Code. Sem trocar de número. Atendimento automatizado 24h.</p>
+          <span class="tag tag-green">Pronto para uso</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>⚠️ Nota sobre integrações VetSmart e PetLove:</strong> A viabilidade técnica dessas integrações depende da disponibilidade e acesso às APIs desses sistemas. Vamos verificar durante a fase de implementação e, caso não haja API aberta, proporemos alternativas (ex: webhook, importação manual ou integração via n8n).
+    </div>
+  </div>
+
+  <!-- COMO FUNCIONA -->
+  <div class="section">
+    <div class="section-label">Implementação</div>
+    <h2>Como funciona o processo</h2>
+    <p>Nós fazemos tudo por você. A EquilibVet não precisa configurar nada.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot">1</div>
+        <div class="timeline-content">
+          <h4>Briefing e levantamento</h4>
+          <p>Entendemos os serviços, valores, equipe, horários, convênios e tom de voz da EquilibVet.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">2</div>
+        <div class="timeline-content">
+          <h4>Implementação personalizada</h4>
+          <p>Configuramos os 5 agentes IA, adaptamos nomenclaturas, criamos o prompt e integramos o WhatsApp.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">3</div>
+        <div class="timeline-content">
+          <h4>Integrações VetSmart / PetLove</h4>
+          <p>Verificamos APIs disponíveis e implementamos as integrações de prontuário, convênio e agenda.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">4</div>
+        <div class="timeline-content">
+          <h4>Treinamento e ativação</h4>
+          <p>Mostramos como usar o dashboard, acompanhar métricas e ajustar os agentes. Sistema 100% ativo.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot">5</div>
+        <div class="timeline-content">
+          <h4>Acompanhamento contínuo</h4>
+          <p>Monitoramos resultados, ajustamos agentes e otimizamos a performance continuamente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVESTIMENTO -->
+  <div class="section">
+    <div class="section-label">Investimento</div>
+    <h2>Valor do projeto</h2>
+
+    <div class="pricing-card">
+      <div class="price">R$ 1.297<span>/mês</span></div>
+      <div class="price-label">Plano ClinPRO Profissional — Veterinário</div>
+
+      <div class="pricing-includes">
+        <div class="pricing-item"><div class="pricing-check">✓</div>5 Agentes IA (24/7)</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>WhatsApp automatizado</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Dashboard em tempo real</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Pipeline de vendas</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Confirmação automática</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Follow-up D1/D3/D7</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Nomenclaturas personalizadas</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Integração VetSmart*</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Integração PetLove*</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Suporte via WhatsApp</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Implementação inclusa</div>
+        <div class="pricing-item"><div class="pricing-check">✓</div>Acompanhamento mensal</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>*Integrações VetSmart e PetLove:</strong> Inclusas no plano, sujeitas à disponibilidade de API. Caso não haja API aberta, serão propostas alternativas sem custo adicional.
+    </div>
+  </div>
+
+  <!-- SUPORTE -->
+  <div class="section">
+    <div class="section-label">Suporte</div>
+    <h2>O que você recebe</h2>
+    <ul class="check-list">
+      <li><span class="dot">✓</span>Suporte técnico via WhatsApp em horário comercial</li>
+      <li><span class="dot">✓</span>Ajustes nos agentes e prompts a qualquer momento</li>
+      <li><span class="dot">✓</span>Monitoramento contínuo de performance dos agentes</li>
+      <li><span class="dot">✓</span>Relatórios mensais de resultados</li>
+      <li><span class="dot">✓</span>Atualizações do sistema sem custo adicional</li>
+      <li><span class="dot">✓</span>Treinamento para novos colaboradores</li>
+    </ul>
+  </div>
+
+  <!-- FOOTER / CTA -->
+  <div class="footer">
+    <p style="font-size:15px;color:var(--ink);font-weight:600;margin-bottom:4px">Pronto para transformar o atendimento da EquilibVet?</p>
+    <p>Clique abaixo para aceitar a proposta e iniciar a implementação.</p>
+    <a href="https://wa.me/5541997038671?text=Olá!%20Aceito%20a%20proposta%20do%20ClinPRO%20para%20a%20EquilibVet.%20Vamos%20começar!" class="cta">Eu quero o ClinPRO →</a>
+    <p style="margin-top:16px;font-size:12px;color:var(--ink-tertiary)">
+      FyreTech Soluções Digitais<br>
+      WhatsApp: (41) 99703-8671<br>
+      gestaoclinpro.com.br
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>
