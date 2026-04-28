@@ -9,14 +9,19 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
-const TZ = "America/Sao_Paulo";
+// Treat datetime as local time (São Paulo) — n8n saves without proper offset
+function parseLocalDt(dt: string) {
+  // Remove trailing Z so JS doesn't treat as UTC
+  const clean = dt.replace(/Z$/, "").replace(/\+00:00$/, "");
+  return new Date(clean);
+}
 
 function formatTime(dt: string) {
-  return new Date(dt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: TZ });
+  return parseLocalDt(dt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 function formatDate(dt: string) {
-  return new Date(dt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: TZ });
+  return parseLocalDt(dt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 function getDaysInMonth(y: number, m: number) { return new Date(y, m + 1, 0).getDate(); }
@@ -102,8 +107,7 @@ export default function AppointmentsPage() {
   const appointmentDays = useMemo(() => {
     const set = new Set<number>();
     appointments.forEach((a) => {
-      const d = new Date(a.datetime);
-      const localDate = new Date(d.toLocaleString("en-US", { timeZone: TZ }));
+      const localDate = parseLocalDt(a.datetime);
       if (localDate.getMonth() === month && localDate.getFullYear() === year) set.add(localDate.getDate());
     });
     return set;
@@ -120,10 +124,9 @@ export default function AppointmentsPage() {
 
   const dayAppointments = useMemo(() => {
     return appointments.filter((a) => {
-      const d = new Date(a.datetime);
-      const localDate = new Date(d.toLocaleString("en-US", { timeZone: TZ }));
+      const localDate = parseLocalDt(a.datetime);
       return localDate.getDate() === selectedDay && localDate.getMonth() === month && localDate.getFullYear() === year;
-    }).sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
+    }).sort((a, b) => parseLocalDt(a.datetime).getTime() - parseLocalDt(b.datetime).getTime());
   }, [appointments, selectedDay, month, year]);
 
   const dayBlockedSlots = useMemo(() => {

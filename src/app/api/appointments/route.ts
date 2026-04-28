@@ -25,6 +25,25 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createAdminClient();
+
+  // Dedup: check if appointment already exists for same phone + same day
+  if (phone) {
+    const dtDate = datetime.split("T")[0];
+    const { data: existing } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("tenant_id", tenant_id)
+      .eq("phone", phone)
+      .gte("datetime", `${dtDate}T00:00:00`)
+      .lte("datetime", `${dtDate}T23:59:59`)
+      .neq("status", "cancelado")
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      return NextResponse.json({ appointment: existing[0], duplicate: true, message: "Agendamento já existe para este dia" });
+    }
+  }
+
   const { data, error } = await supabase
     .from("appointments")
     .insert({
