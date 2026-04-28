@@ -11,6 +11,7 @@ import {
 } from "@hello-pangea/dnd";
 import { Phone, Sparkles, GripVertical, Clock, User, Bot, Loader2, RefreshCw, TrendingUp, Users, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useProfilePhotos } from "@/lib/use-profile-photos";
 import LeadCardModal from "@/components/lead-card-modal";
 
 interface Lead {
@@ -91,9 +92,11 @@ export default function PipelinePage() {
     return () => clearInterval(interval);
   }, [fetchLeads]);
 
-  const totalLeads = Object.values(board).reduce((acc, leads) => acc + leads.length, 0);
-  const hotLeads = Object.values(board).flat().filter((l) => l.lead_score === "quente").length;
-  const warmLeads = Object.values(board).flat().filter((l) => l.lead_score === "morno").length;
+  const allLeads = Object.values(board).flat();
+  const totalLeads = allLeads.length;
+  const hotLeads = allLeads.filter((l) => l.lead_score === "quente").length;
+  const warmLeads = allLeads.filter((l) => l.lead_score === "morno").length;
+  const photos = useProfilePhotos(allLeads.map((l) => l.phone), tenantId);
 
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId } = result;
@@ -265,6 +268,11 @@ export default function PipelinePage() {
                                 <div {...provided.dragHandleProps} className="mt-0.5 text-ink-tertiary opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
                                   <GripVertical className="h-3.5 w-3.5" />
                                 </div>
+                                {photos[lead.phone] ? (
+                                  <img src={photos[lead.phone]!} alt="" className="h-7 w-7 rounded-full object-cover shrink-0 mt-0.5" />
+                                ) : (
+                                  <div className="h-7 w-7 rounded-full brand-gradient flex items-center justify-center text-[9px] font-bold text-white shrink-0 mt-0.5">{lead.name?.slice(0,2).toUpperCase() || "?"}</div>
+                                )}
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center justify-between gap-1">
                                     <p className="text-[13px] font-semibold text-ink truncate">{lead.name}</p>

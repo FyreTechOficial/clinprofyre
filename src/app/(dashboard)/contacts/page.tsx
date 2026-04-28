@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useProfilePhotos } from "@/lib/use-profile-photos";
 import LeadCardModal from "@/components/lead-card-modal";
 
 interface Contact {
@@ -64,6 +65,7 @@ export default function ContactsPage() {
   const [stageFilter, setStageFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const photos = useProfilePhotos(contacts.map((c) => c.phone), tenantId);
 
   useEffect(() => {
     if (!tenantId) return;
@@ -160,9 +162,13 @@ export default function ContactsPage() {
                   <tr key={c.id} className="border-b border-hairline hover:bg-brand-50/20 transition-colors cursor-pointer" onClick={() => setSelectedContact(c)}>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700 text-xs font-bold">
-                          {(c.name ?? c.phone).split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
-                        </div>
+                        {photos[c.phone] ? (
+                          <img src={photos[c.phone]!} alt="" className="h-9 w-9 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full brand-gradient text-white text-xs font-bold shrink-0">
+                            {(c.name ?? c.phone).split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+                          </div>
+                        )}
                         <div>
                           <p className="font-semibold text-ink">{c.name ?? c.phone}</p>
                           <p className="text-xs text-ink-tertiary flex items-center gap-1"><Phone className="h-3 w-3" />{c.phone}</p>
