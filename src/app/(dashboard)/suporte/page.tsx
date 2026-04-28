@@ -123,7 +123,7 @@ export default function SuportePage() {
             <ExternalLink className="h-4 w-4 text-ink-tertiary ml-auto group-hover:text-brand-500 transition-colors" />
           </a>
           <a
-            href="https://wa.me/5541997246413"
+            href="https://wa.me/5541997038671"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-4 rounded-2xl border border-hairline bg-canvas p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"

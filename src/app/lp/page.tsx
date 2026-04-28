@@ -109,7 +109,7 @@ function Nav() {
         </div>
         <div className="hidden md:flex items-center gap-3">
           <a href="/login" className="text-[14px] font-medium text-ink-secondary hover:text-ink transition-colors px-4 py-2">Entrar</a>
-          <a href="https://wa.me/5541999999999?text=Eu%20quero%20o%20ClinPro" target="_blank" className="rounded-full brand-gradient px-5 py-2.5 text-[13px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all">
+          <a href="https://wa.me/5541997038671?text=Eu%20quero%20o%20ClinPro" target="_blank" className="rounded-full brand-gradient px-5 py-2.5 text-[13px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all">
             Eu quero o ClinPro
           </a>
         </div>
@@ -129,7 +129,7 @@ function Nav() {
             <a key={item.label} href={item.href} onClick={() => setOpen(false)} className="block text-[14px] text-ink-secondary py-2">{item.label}</a>
           ))}
           <a href="/login" className="block text-[14px] text-ink py-2 font-medium">Entrar</a>
-          <a href="https://wa.me/5541999999999?text=Eu%20quero%20o%20ClinPro" target="_blank" className="block text-center rounded-full brand-gradient px-5 py-3 text-[14px] font-medium text-white">Eu quero o ClinPro</a>
+          <a href="https://wa.me/5541997038671?text=Eu%20quero%20o%20ClinPro" target="_blank" className="block text-center rounded-full brand-gradient px-5 py-3 text-[14px] font-medium text-white">Eu quero o ClinPro</a>
         </div>
       )}
     </nav>
@@ -191,7 +191,7 @@ function Hero() {
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-[fadeInUp_0.7s_ease-out_0.4s_both]">
             <a
-              href="https://wa.me/5541999999999?text=Quero%20testar%20o%20ClinPro"
+              href="https://wa.me/5541997038671?text=Quero%20testar%20o%20ClinPro"
               target="_blank"
               className="rounded-full brand-gradient px-8 py-4 text-[16px] font-semibold text-white hover:brightness-110 active:scale-[0.97] transition-all flex items-center gap-2 shadow-lg shadow-brand-900/20"
             >
@@ -523,7 +523,7 @@ function PainPoints() {
         <div className="text-center mt-12">
           <p className="text-[15px] text-ink-secondary mb-4">Reconheceu algum desses problemas?</p>
           <a
-            href="https://wa.me/5541999999999?text=Quero%20resolver%20esses%20problemas%20na%20minha%20clínica"
+            href="https://wa.me/5541997038671?text=Quero%20resolver%20esses%20problemas%20na%20minha%20clínica"
             target="_blank"
             className="inline-flex items-center gap-2 rounded-full brand-gradient px-8 py-4 text-[15px] font-semibold text-white hover:brightness-110 active:scale-[0.97] transition-all shadow-lg shadow-brand-900/20"
           >
@@ -764,7 +764,7 @@ function SystemShowcase() {
                 ))}
               </div>
 
-              <a href="https://wa.me/5541999999999?text=Quero%20ver%20uma%20demo%20do%20ClinPro" target="_blank" className="inline-flex items-center gap-2 rounded-full brand-gradient px-6 py-3 text-[14px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all shadow-lg shadow-brand-900/20">
+              <a href="https://wa.me/5541997038671?text=Quero%20ver%20uma%20demo%20do%20ClinPro" target="_blank" className="inline-flex items-center gap-2 rounded-full brand-gradient px-6 py-3 text-[14px] font-medium text-white hover:brightness-110 active:scale-[0.97] transition-all shadow-lg shadow-brand-900/20">
                 Eu quero o ClinPro <ArrowRight className="h-4 w-4" />
               </a>
             </div>
@@ -885,7 +885,7 @@ function HowItWorks() {
 
         <div className="text-center mt-14">
           <a
-            href="https://wa.me/5541999999999?text=Quero%20falar%20com%20um%20especialista%20ClinPro"
+            href="https://wa.me/5541997038671?text=Quero%20falar%20com%20um%20especialista%20ClinPro"
             target="_blank"
             className="rounded-full brand-gradient px-8 py-4 text-[16px] font-semibold text-white hover:brightness-110 active:scale-[0.97] transition-all inline-flex items-center gap-2 shadow-lg shadow-brand-900/20"
           >
@@ -1022,7 +1022,7 @@ function LossCalculator() {
 
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
                   <a
-                    href="https://wa.me/5541999999999?text=Quero%20recuperar%20esses%20valores%20na%20minha%20clínica"
+                    href="https://wa.me/5541997038671?text=Quero%20recuperar%20esses%20valores%20na%20minha%20clínica"
                     target="_blank"
                     className="rounded-full bg-white px-6 py-3 text-[14px] font-semibold text-brand-700 hover:bg-white/90 active:scale-[0.97] transition-all text-center"
                   >
@@ -1157,7 +1157,7 @@ function FinalCTA() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
-                href="https://wa.me/5541999999999?text=Quero%20testar%20o%20ClinPro%20grátis"
+                href="https://wa.me/5541997038671?text=Quero%20testar%20o%20ClinPro%20grátis"
                 target="_blank"
                 className="rounded-full bg-white px-8 py-4 text-[16px] font-semibold text-brand-700 hover:bg-white/90 active:scale-[0.97] transition-all flex items-center gap-2"
               >
